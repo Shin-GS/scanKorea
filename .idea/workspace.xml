@@ -4,9 +4,20 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ec2051e3-c96e-4663-a003-df58efa6ce56" name="Changes" comment="feat: spring boot 세팅 추가">
+    <list default="true" id="ec2051e3-c96e-4663-a003-df58efa6ce56" name="Changes" comment="feat: htmx 의존성 추가">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/scankorea/server/common/constant/CategoryCode.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/scankorea/server/common/constant/LanguageCode.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/scankorea/server/common/constant/TargetType.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/scankorea/server/common/constant/VariantType.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/scankorea/server/domain/entity/BaseTimeEntity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/scankorea/server/domain/entity/ingredient/IngredientEntity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/scankorea/server/domain/entity/product/ProductEntity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/scankorea/server/domain/entity/product/ProductIngredientEntity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/scankorea/server/domain/entity/product/ProductLocaleEntity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/scankorea/server/domain/entity/product/ProductVariantEntity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/scankorea/server/domain/entity/product/ProductVariantLocaleEntity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/scankorea/server/domain/entity/rating/RatingSnapshotEntity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -128,7 +139,7 @@
       <workItem from="1759193939546" duration="425000" />
       <workItem from="1759194382884" duration="67000" />
       <workItem from="1759194465894" duration="2549000" />
-      <workItem from="1759197059080" duration="279000" />
+      <workItem from="1759197059080" duration="3387000" />
     </task>
     <task id="LOCAL-00001" summary="feat: readme.md">
       <option name="closed" value="true" />
@@ -170,7 +181,15 @@
       <option name="project" value="LOCAL" />
       <updated>1759197234073</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="feat: htmx 의존성 추가">
+      <option name="closed" value="true" />
+      <created>1759197399951</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1759197399951</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -181,6 +200,7 @@
     <MESSAGE value="feat: gitignore" />
     <MESSAGE value="feat: .idea" />
     <MESSAGE value="feat: spring boot 세팅 추가" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: spring boot 세팅 추가" />
+    <MESSAGE value="feat: htmx 의존성 추가" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: htmx 의존성 추가" />
   </component>
 </project>
