@@ -1,0 +1,32 @@
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+
+### VS Code ###
+.vscode/
+
+### Mac/Linux/Windows System Files ###
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+### Logs ###
+*.log
+
+### Gradle ###
+.gradle/
+build/
+out/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### Spring Boot ###
+/target/
+
+### Environment ###
+.env
+*.env
