@@ -4,21 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ec2051e3-c96e-4663-a003-df58efa6ce56" name="Changes" comment="feat: .idea">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/gradlew" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/gradlew.bat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/settings.gradle" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/scankorea/server/ScanKoreaApplication.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/scankorea/server/controller/HealthCheckApi.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/application.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/com/scankorea/server/ScanKoreaApplicationTests.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+    <list default="true" id="ec2051e3-c96e-4663-a003-df58efa6ce56" name="Changes" comment="feat: spring boot 세팅 추가">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -140,7 +128,7 @@
       <workItem from="1759193939546" duration="425000" />
       <workItem from="1759194382884" duration="67000" />
       <workItem from="1759194465894" duration="2549000" />
-      <workItem from="1759197059080" duration="78000" />
+      <workItem from="1759197059080" duration="279000" />
     </task>
     <task id="LOCAL-00001" summary="feat: readme.md">
       <option name="closed" value="true" />
@@ -174,7 +162,15 @@
       <option name="project" value="LOCAL" />
       <updated>1759195642031</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="feat: spring boot 세팅 추가">
+      <option name="closed" value="true" />
+      <created>1759197234073</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1759197234073</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -184,6 +180,7 @@
     <MESSAGE value="feat: readme.md" />
     <MESSAGE value="feat: gitignore" />
     <MESSAGE value="feat: .idea" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: .idea" />
+    <MESSAGE value="feat: spring boot 세팅 추가" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: spring boot 세팅 추가" />
   </component>
 </project>
