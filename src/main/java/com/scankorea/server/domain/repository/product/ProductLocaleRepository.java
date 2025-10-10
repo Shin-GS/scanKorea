@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface ProductLocaleRepository extends JpaRepository<ProductLocaleEntity, Long> {
-    Optional<ProductLocaleEntity> findFirstByProductIdAndLangAndReviewedTrue(Long productId, LanguageCode lang);
+    Optional<ProductLocaleEntity> findFirstByProductIdAndLang(Long productId, LanguageCode lang);
 }

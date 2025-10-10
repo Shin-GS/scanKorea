@@ -4,20 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ec2051e3-c96e-4663-a003-df58efa6ce56" name="Changes" comment="feat: htmx 의존성 추가">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/scankorea/server/common/constant/CategoryCode.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/scankorea/server/common/constant/LanguageCode.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/scankorea/server/common/constant/TargetType.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/scankorea/server/common/constant/VariantType.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/scankorea/server/domain/entity/BaseTimeEntity.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/scankorea/server/domain/entity/ingredient/IngredientEntity.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/scankorea/server/domain/entity/product/ProductEntity.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/scankorea/server/domain/entity/product/ProductIngredientEntity.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/scankorea/server/domain/entity/product/ProductLocaleEntity.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/scankorea/server/domain/entity/product/ProductVariantEntity.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/scankorea/server/domain/entity/product/ProductVariantLocaleEntity.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/scankorea/server/domain/entity/rating/RatingSnapshotEntity.java" afterDir="false" />
+    <list default="true" id="ec2051e3-c96e-4663-a003-df58efa6ce56" name="Changes" comment="feat: 파일 업로드 제한 추가">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/scankorea/server/common/constant/Constant.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/scankorea/server/controller/LookupApi.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/scankorea/server/controller/ScanController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/scankorea/server/service/product/BarcodeDecoder.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/scankorea/server/service/product/ProductService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/scankorea/server/service/product/response/ProductViewResponse.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/scankorea/server/domain/repository/product/ProductLocaleRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/scankorea/server/domain/repository/product/ProductLocaleRepository.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,6 +45,7 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="Interface" />
         <option value="Class" />
       </list>
     </option>
@@ -91,7 +88,7 @@
     "Spring Boot.ScanKoreaApplication.executor": "Debug",
     "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/user/Desktop/scanKorea/src/main/resources",
+    "last_opened_file_path": "C:/Users/user/Desktop/scanKorea",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -100,7 +97,7 @@
     "project.structure.last.edited": "SDKs",
     "project.structure.proportion": "0.0",
     "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "project.propCompiler",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -139,7 +136,10 @@
       <workItem from="1759193939546" duration="425000" />
       <workItem from="1759194382884" duration="67000" />
       <workItem from="1759194465894" duration="2549000" />
-      <workItem from="1759197059080" duration="3387000" />
+      <workItem from="1759197059080" duration="3505000" />
+      <workItem from="1759280099214" duration="8893000" />
+      <workItem from="1760078288016" duration="2506000" />
+      <workItem from="1760080835764" duration="789000" />
     </task>
     <task id="LOCAL-00001" summary="feat: readme.md">
       <option name="closed" value="true" />
@@ -189,7 +189,39 @@
       <option name="project" value="LOCAL" />
       <updated>1759197399951</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="feat: entity 추가">
+      <option name="closed" value="true" />
+      <created>1759205258942</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1759205258942</updated>
+    </task>
+    <task id="LOCAL-00008" summary="feat: repository 추가">
+      <option name="closed" value="true" />
+      <created>1760078761520</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1760078761520</updated>
+    </task>
+    <task id="LOCAL-00009" summary="feat: 의존성 추가&#10;바코드 디코딩 관련 의존성 추가">
+      <option name="closed" value="true" />
+      <created>1760079032005</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1760079032005</updated>
+    </task>
+    <task id="LOCAL-00010" summary="feat: 파일 업로드 제한 추가">
+      <option name="closed" value="true" />
+      <created>1760079575761</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1760079575761</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -201,6 +233,10 @@
     <MESSAGE value="feat: .idea" />
     <MESSAGE value="feat: spring boot 세팅 추가" />
     <MESSAGE value="feat: htmx 의존성 추가" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: htmx 의존성 추가" />
+    <MESSAGE value="feat: entity 추가" />
+    <MESSAGE value="feat: repository 추가" />
+    <MESSAGE value="feat: 의존성 추가&#10;바코드 디코딩 관련 의존성 추가" />
+    <MESSAGE value="feat: 파일 업로드 제한 추가" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: 파일 업로드 제한 추가" />
   </component>
 </project>

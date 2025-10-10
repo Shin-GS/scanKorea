@@ -36,7 +36,7 @@ dependencies {
     implementation 'io.github.wimdeblauwe:htmx-spring-boot:3.5.0'
     implementation 'io.github.wimdeblauwe:htmx-spring-boot-thymeleaf:3.5.0'
 
-    // ZXing (바코드 디코딩)
+    // ZXing: 사진 속 바코드 인식
     implementation 'com.google.zxing:core:3.5.3'
     implementation 'com.google.zxing:javase:3.5.3'
 }
