@@ -35,6 +35,10 @@ dependencies {
 
     implementation 'io.github.wimdeblauwe:htmx-spring-boot:3.5.0'
     implementation 'io.github.wimdeblauwe:htmx-spring-boot-thymeleaf:3.5.0'
+
+    // ZXing (바코드 디코딩)
+    implementation 'com.google.zxing:core:3.5.3'
+    implementation 'com.google.zxing:javase:3.5.3'
 }
 
 tasks.named('test') {
