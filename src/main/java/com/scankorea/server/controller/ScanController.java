@@ -51,7 +51,7 @@ public class ScanController {
     }
 
     @GetMapping("/p/{gtin}")
-    public String productDetail(@PathVariable String gtin,
+    public String productDetail(@PathVariable(name = "gtin") String gtin,
                                 @RequestParam(name = "lang") LanguageCode lang,
                                 Model model) {
         ProductViewResponse view = productService.findView(gtin, lang);

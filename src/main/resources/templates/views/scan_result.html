@@ -114,7 +114,7 @@
 
             <div>
                 <a class="button"
-                   th:href="@{|/p/${p.gtin}?lang=${param.lang}|}">
+                   th:href="@{/p/{gtin}(gtin=${p.gtin}, lang=${param.lang})}">
                     View details
                 </a>
             </div>
