@@ -4,16 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ec2051e3-c96e-4663-a003-df58efa6ce56" name="Changes" comment="feat: 파일 업로드 제한 추가">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/scankorea/server/common/constant/Constant.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/scankorea/server/controller/LookupApi.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/scankorea/server/controller/ScanController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/scankorea/server/service/product/BarcodeDecoder.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/scankorea/server/service/product/ProductService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/scankorea/server/service/product/response/ProductViewResponse.java" afterDir="false" />
+    <list default="true" id="ec2051e3-c96e-4663-a003-df58efa6ce56" name="Changes" comment="feat: API 구현&#10;&#10;사진에서 gtins 추출&#10;gtins와 언어 코드를 통해 조회">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/scankorea/server/domain/repository/product/ProductLocaleRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/scankorea/server/domain/repository/product/ProductLocaleRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/views/product_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/views/product_detail.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/views/scan.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/views/scan.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/views/scan_result.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/views/scan_result.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -139,7 +135,7 @@
       <workItem from="1759197059080" duration="3505000" />
       <workItem from="1759280099214" duration="8893000" />
       <workItem from="1760078288016" duration="2506000" />
-      <workItem from="1760080835764" duration="789000" />
+      <workItem from="1760080835764" duration="1108000" />
     </task>
     <task id="LOCAL-00001" summary="feat: readme.md">
       <option name="closed" value="true" />
@@ -221,7 +217,15 @@
       <option name="project" value="LOCAL" />
       <updated>1760079575761</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="feat: API 구현&#10;&#10;사진에서 gtins 추출&#10;gtins와 언어 코드를 통해 조회">
+      <option name="closed" value="true" />
+      <created>1760081837733</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1760081837733</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -237,6 +241,7 @@
     <MESSAGE value="feat: repository 추가" />
     <MESSAGE value="feat: 의존성 추가&#10;바코드 디코딩 관련 의존성 추가" />
     <MESSAGE value="feat: 파일 업로드 제한 추가" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: 파일 업로드 제한 추가" />
+    <MESSAGE value="feat: API 구현&#10;&#10;사진에서 gtins 추출&#10;gtins와 언어 코드를 통해 조회" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: API 구현&#10;&#10;사진에서 gtins 추출&#10;gtins와 언어 코드를 통해 조회" />
   </component>
 </project>
