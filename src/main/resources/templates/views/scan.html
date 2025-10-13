@@ -1,111 +1,87 @@
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="utf-8"/>
-    <title>ScanKorea · Barcode Helper</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        brand: '#1e88e5',
-                        'brand-light': '#e3f2fd',
-                    },
-                    borderRadius: {
-                        xl: '14px',
-                    },
-                },
-            },
-        };
-    </script>
+<head th:replace="~{views/layout :: head}">
+    <!--/*@thymesVar id="pageTitle" type="java.lang.String"*/-->
+    <title th:text="${pageTitle} ?: 'ScanKorea'">ScanKorea</title>
 </head>
-<body class="min-h-screen flex flex-col items-center bg-gradient-to-b from-brand-light to-white text-gray-800 font-sans">
-<!-- Header -->
-<header class="w-full max-w-md text-center py-10 px-4">
-    <h1 class="text-3xl font-bold text-brand">ScanKorea</h1>
-    <p class="text-gray-600 mt-2 text-base">Your travel barcode helper</p>
-</header>
-
-<!-- Main -->
-<main role="main" class="w-full max-w-md bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 sm:p-8 mb-10 mx-4">
-    <!-- Error message -->
-    <div th:if="${error}" class="bg-red-50 border border-red-200 text-red-700 text-center rounded-lg py-3 px-4 mb-4"
-         th:text="${error}">
-        There was an error scanning the barcode.
-    </div>
-
-    <form th:action="@{/scan}" method="post" enctype="multipart/form-data" class="space-y-6">
-        <!-- Language selection -->
-        <div>
-            <label for="lang" class="block font-semibold mb-2 text-gray-700 dark:text-gray-200">🌍 Choose
-                Language</label>
-            <select id="lang" name="lang" required
-                    class="w-full border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 text-gray-800 dark:text-gray-100 rounded-lg p-3">
-                <option th:each="lc : ${T(com.scankorea.server.common.constant.LanguageCode).values()}"
-                        th:value="${lc}"
-                        th:text="${lc}"
-                        th:attrappend="selected=${lc.name() == 'EN'}">EN
-                </option>
-            </select>
+<body>
+<main th:fragment="~{views/layout :: content}">
+    <section class="w-full max-w-md bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 sm:p-8 mb-10 mx-auto">
+        <!-- Error message -->
+        <div th:if="${error}"
+             class="bg-red-50 border border-red-200 text-red-700 text-center rounded-lg py-3 px-4 mb-4"
+             th:text="${error}">
+            There was an error scanning the barcode.
         </div>
 
-        <!-- Drop zone -->
-        <div>
-            <label for="file" class="block font-semibold mb-2 text-gray-700 dark:text-gray-200">📸 Upload or take a
-                photo</label>
-            <div id="dropZone"
-                 class="border-2 border-dashed border-brand bg-brand-light/40 text-gray-500 text-center rounded-xl py-10 px-4 transition hover:bg-blue-50 cursor-pointer">
-                <div>Tap to select or drag a photo here</div>
-                <div id="fileName" class="text-sm text-gray-500 mt-2">No file selected</div>
+        <!-- Upload form -->
+        <form th:action="@{/scan}" method="post" enctype="multipart/form-data" class="space-y-6">
+            <!-- Language selection -->
+            <div>
+                <label for="lang" class="block font-semibold mb-2 text-gray-700 dark:text-gray-200">
+                    🌍 Choose Language
+                </label>
+                <select id="lang" name="lang" required
+                        class="w-full border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 text-gray-800 dark:text-gray-100 rounded-lg p-3">
+                    <option th:each="lc : ${T(com.scankorea.server.common.constant.LanguageCode).values()}"
+                            th:value="${lc}"
+                            th:text="${lc}"
+                            th:attrappend="selected=${lc.name() == 'EN'}">EN
+                    </option>
+                </select>
             </div>
-            <input id="file" type="file" name="file" accept="image/*" capture="environment" hidden required>
-        </div>
 
-        <!-- Submit button -->
-        <button type="submit"
-                class="w-full bg-brand hover:bg-blue-700 text-white font-semibold rounded-xl py-3 mt-6 shadow-sm transition">
-            Scan Barcode
-        </button>
-    </form>
+            <!-- Drop zone -->
+            <div>
+                <label for="file" class="block font-semibold mb-2 text-gray-700 dark:text-gray-200">
+                    📸 Upload or take a photo
+                </label>
+                <div id="dropZone"
+                     class="border-2 border-dashed border-brand bg-brand-light/40 text-gray-500 text-center rounded-xl py-10 px-4 transition hover:bg-blue-50 cursor-pointer">
+                    <div>Tap to select or drag a photo here</div>
+                    <div id="fileName" class="text-sm text-gray-500 mt-2">No file selected</div>
+                </div>
+                <input id="file" type="file" name="file" accept="image/*" capture="environment" hidden required>
+            </div>
 
-    <p class="text-center text-sm text-gray-500 mt-6">
-        💡 Tip: Use clear lighting and keep the barcode centered.
-    </p>
+            <!-- Submit button -->
+            <button type="submit"
+                    class="w-full bg-brand hover:bg-blue-700 text-white font-semibold rounded-xl py-3 mt-6 shadow-sm transition">
+                Scan Barcode
+            </button>
+        </form>
+
+        <p class="text-center text-sm text-gray-500 mt-6">
+            Tip: Use clear lighting and keep the barcode centered.
+        </p>
+    </section>
+
+    <!-- File upload script -->
+    <script>
+        const drop = document.getElementById('dropZone');
+        const input = document.getElementById('file');
+        const fileName = document.getElementById('fileName');
+
+        drop.addEventListener('click', () => input.click());
+        drop.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            drop.classList.add('bg-blue-100');
+        });
+        drop.addEventListener('dragleave', () => drop.classList.remove('bg-blue-100'));
+        drop.addEventListener('drop', (e) => {
+            e.preventDefault();
+            drop.classList.remove('bg-blue-100');
+            const file = e.dataTransfer.files[0];
+            if (file) {
+                input.files = e.dataTransfer.files;
+                fileName.textContent = file.name;
+            }
+        });
+        input.addEventListener('change', () => {
+            const file = input.files[0];
+            fileName.textContent = file ? file.name : 'No file selected';
+        });
+    </script>
 </main>
-
-<!-- Footer -->
-<footer class="text-center text-xs text-gray-500 dark:text-gray-400 pb-6">
-    © 2025 ScanKorea · Helping travelers read Korean products
-</footer>
-
-<!-- Script -->
-<script>
-    const drop = document.getElementById('dropZone');
-    const input = document.getElementById('file');
-    const fileName = document.getElementById('fileName');
-
-    drop.addEventListener('click', () => input.click());
-    drop.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        drop.classList.add('bg-blue-100');
-    });
-    drop.addEventListener('dragleave', () => drop.classList.remove('bg-blue-100'));
-    drop.addEventListener('drop', (e) => {
-        e.preventDefault();
-        drop.classList.remove('bg-blue-100');
-        const file = e.dataTransfer.files[0];
-        if (file) {
-            input.files = e.dataTransfer.files;
-            fileName.textContent = file.name;
-        }
-    });
-    input.addEventListener('change', () => {
-        const file = input.files[0];
-        fileName.textContent = file ? file.name : 'No file selected';
-    });
-</script>
 </body>
 </html>

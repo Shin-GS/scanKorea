@@ -1,98 +1,91 @@
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="utf-8"/>
-    <title>Scan Result</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        brand: '#1e88e5',
-                        'brand-light': '#e3f2fd',
-                    },
-                    borderRadius: {
-                        xl: '14px',
-                    },
-                },
-            },
-        };
-    </script>
+<head th:replace="~{views/layout :: head}">
+    <!--/*@thymesVar id="pageTitle" type="java.lang.String"*/-->
+    <title th:text="${pageTitle} ?: 'ScanKorea'">ScanKorea</title>
 </head>
+<body>
+<main th:fragment="~{views/layout :: content}">
+    <!-- Toolbar for re-scan -->
+    <section class="w-full max-w-5xl flex flex-wrap justify-between items-center gap-4 mb-8 mx-auto">
+        <h1 class="text-2xl sm:text-3xl font-bold text-brand dark:text-blue-400">Scan Result</h1>
 
-<body class="min-h-screen bg-gradient-to-b from-brand-light to-white dark:from-slate-900 dark:to-slate-950 text-gray-800 dark:text-gray-100 font-sans flex flex-col items-center p-4 sm:p-8">
-<!-- Header -->
-<header class="w-full max-w-5xl flex flex-col sm:flex-row justify-between items-center gap-4 mb-8">
-    <h1 class="text-2xl sm:text-3xl font-bold text-brand dark:text-blue-400">Scan Result</h1>
+        <form class="flex flex-wrap items-center gap-2" th:action="@{/scan}" method="post"
+              enctype="multipart/form-data">
+            <label for="lang" class="text-sm text-gray-600 dark:text-gray-300">Language</label>
+            <select id="lang" name="lang" required
+                    class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-800 dark:text-gray-100">
+                <option th:each="lc : ${T(com.scankorea.server.common.constant.LanguageCode).values()}"
+                        th:selected="${#strings.equals(lc, param.lang)}"
+                        th:value="${lc}"
+                        th:text="${lc}">EN
+                </option>
+            </select>
 
-    <form class="flex flex-wrap items-center gap-2" th:action="@{/scan}" method="post" enctype="multipart/form-data">
-        <!-- <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/> -->
-        <label for="lang" class="text-sm text-gray-600 dark:text-gray-300">Language</label>
-        <select id="lang" name="lang" required
-                class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-800 dark:text-gray-100">
-            <option th:each="lc : ${T(com.scankorea.server.common.constant.LanguageCode).values()}"
-                    th:selected="${#strings.equals(lc, param.lang)}"
-                    th:value="${lc}"
-                    th:text="${lc}">EN
-            </option>
-        </select>
-        <input type="file" name="file" accept="image/*"
-               class="text-sm text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-slate-600 rounded-lg px-2 py-1 bg-gray-50 dark:bg-slate-700"
-               required>
-        <button type="submit"
-                class="bg-brand hover:bg-blue-700 text-white font-semibold rounded-lg px-4 py-2 transition">
-            Re-scan
-        </button>
-        <a th:href="@{'/scan'}"
-           class="bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg px-4 py-2 transition">
-            Back
-        </a>
-    </form>
-</header>
+            <input type="file" name="file" accept="image/*"
+                   class="text-sm text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-slate-600 rounded-lg px-2 py-1 bg-gray-50 dark:bg-slate-700"
+                   required>
 
-<!-- Main -->
-<main class="w-full max-w-5xl flex-1">
-    <!-- Empty state -->
-    <div th:if="${#lists.isEmpty(products)}"
-         class="border-2 border-dashed border-gray-300 dark:border-slate-600 bg-white/70 dark:bg-slate-800 text-gray-600 dark:text-gray-300 text-center rounded-xl py-10 px-6 mt-8">
-        <p class="text-lg font-medium mb-2">No products found.</p>
-        <p class="text-sm">Try a clearer photo or a different angle.</p>
-    </div>
+            <button type="submit"
+                    class="bg-brand hover:bg-blue-700 text-white font-semibold rounded-lg px-4 py-2 transition">
+                Re-scan
+            </button>
+            <a th:href="@{'/scan'}"
+               class="bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg px-4 py-2 transition">
+                Back
+            </a>
+        </form>
+    </section>
 
-    <!-- Result grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6" th:if="${!#lists.isEmpty(products)}">
-        <article
-                class="bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 flex flex-col gap-3 transition hover:shadow-lg"
-                th:each="p : ${products}">
-            <img th:if="${p.imageUrl}" th:src="${p.imageUrl}" alt="Product image"
-                 class="w-full h-44 object-cover rounded-lg bg-gray-100 dark:bg-slate-700"/>
+    <!-- Main content area -->
+    <section class="w-full max-w-5xl mx-auto">
 
-            <div>
-                <div class="text-sm text-gray-500 dark:text-gray-400" th:text="${p.brandName}">Brand</div>
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100" th:text="${p.displayName}">Product
-                    Name</h3>
-                <div class="text-sm text-gray-500 dark:text-gray-400">
-                    <span>GTIN:</span> <span th:text="${p.gtin}" class="ml-1">0000000000000</span>
-                    <span th:if="${p.verified}"
-                          class="ml-2 text-blue-600 dark:text-blue-400 font-medium">· Verified</span>
+        <!-- Empty result message -->
+        <div th:if="${#lists.isEmpty(products)}"
+             class="border-2 border-dashed border-gray-300 dark:border-slate-600 bg-white/70 dark:bg-slate-800 text-gray-600 dark:text-gray-300 text-center rounded-xl py-10 px-6 mt-8">
+            <p class="text-lg font-medium mb-2">No products found.</p>
+            <p class="text-sm">Try a clearer photo or a different angle.</p>
+        </div>
+
+        <!-- Grid of results -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"
+             th:if="${!#lists.isEmpty(products)}">
+            <article
+                    class="bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 flex flex-col gap-3 transition hover:shadow-lg"
+                    th:each="p : ${products}">
+
+                <img th:if="${p.imageUrl}" th:src="${p.imageUrl}" alt="Product image"
+                     class="w-full h-44 object-cover rounded-lg bg-gray-100 dark:bg-slate-700"/>
+
+                <div>
+                    <div class="text-sm text-gray-500 dark:text-gray-400" th:text="${p.brandName}">Brand</div>
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100" th:text="${p.displayName}">
+                        Product Name
+                    </h3>
+                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                        <span>GTIN:</span>
+                        <span th:text="${p.gtin}" class="ml-1">0000000000000</span>
+                        <span th:if="${p.verified}" class="ml-2 text-blue-600 dark:text-blue-400 font-medium">
+              · Verified
+            </span>
+                    </div>
                 </div>
-            </div>
 
-            <p th:text="${p.description}" class="text-gray-700 dark:text-gray-300 text-sm leading-snug">
-                Description...
-            </p>
+                <p th:text="${p.description}"
+                   class="text-gray-700 dark:text-gray-300 text-sm leading-snug">
+                    Description...
+                </p>
 
-            <div class="mt-auto pt-2">
-                <a th:href="@{/p/{gtin}(gtin=${p.gtin}, lang=${param.lang})}"
-                   class="block w-full text-center bg-brand hover:bg-blue-700 text-white font-semibold rounded-lg py-2 transition">
-                    View details
-                </a>
-            </div>
-        </article>
-    </div>
+                <div class="mt-auto pt-2">
+                    <a th:href="@{/p/{gtin}(gtin=${p.gtin}, lang=${param.lang})}"
+                       class="block w-full text-center bg-brand hover:bg-blue-700 text-white font-semibold rounded-lg py-2 transition">
+                        View details
+                    </a>
+                </div>
+            </article>
+        </div>
+    </section>
+
 </main>
 </body>
 </html>

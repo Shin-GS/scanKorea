@@ -1,79 +1,66 @@
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="utf-8"/>
-    <title th:text="${product.displayName} ?: 'Product Detail'">Product Detail</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Custom Tailwind Config -->
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        brand: '#1e88e5',
-                        'brand-light': '#e3f2fd',
-                    },
-                    borderRadius: {
-                        xl: '14px',
-                    },
-                },
-            },
-        };
-    </script>
+<head th:replace="~{views/layout :: head}">
+    <!--/*@thymesVar id="pageTitle" type="java.lang.String"*/-->
+    <title th:text="${pageTitle} ?: 'ScanKorea'">ScanKorea</title>
 </head>
+<body>
+<main th:fragment="~{views/layout :: content}">
+    <!-- Product detail content -->
+    <section
+            class="w-full max-w-4xl bg-white dark:bg-slate-800 rounded-xl shadow-md grid grid-cols-1 sm:grid-cols-[300px,1fr] gap-6 sm:gap-8 p-6 sm:p-8 mx-auto">
 
-<body class="min-h-screen bg-gradient-to-b from-brand-light to-white text-gray-800 font-sans p-4 sm:p-8 flex flex-col items-center dark:from-slate-900 dark:to-slate-950 dark:text-gray-100">
-<!-- Header -->
-<header class="w-full max-w-4xl flex flex-col sm:flex-row justify-between items-center gap-4 mb-8">
-    <h1 th:text="${product.displayName}" class="text-2xl sm:text-3xl font-bold text-brand dark:text-blue-400">
-        Product</h1>
+        <!-- Product image -->
+        <img th:if="${product.imageUrl}" th:src="${product.imageUrl}" alt="Product image"
+             class="w-full h-64 object-cover rounded-xl bg-gray-100 dark:bg-slate-700"/>
 
-    <form class="flex flex-wrap items-center gap-2" th:action="@{|/p/${product.gtin}|}" method="get">
-        <label for="lang" class="text-sm text-gray-600 dark:text-gray-300">Language</label>
-        <select id="lang" name="lang"
-                class="px-3 py-2 border border-gray-300 rounded-lg text-gray-800 bg-white dark:bg-slate-700 dark:text-gray-100 dark:border-slate-600">
-            <option th:each="lc : ${T(com.scankorea.server.common.constant.LanguageCode).values()}"
-                    th:selected="${#strings.equals(lc, param.lang)}"
-                    th:value="${lc}"
-                    th:text="${lc}">EN
-            </option>
-        </select>
-        <button type="submit"
-                class="bg-brand hover:bg-blue-700 text-white font-semibold rounded-lg px-4 py-2 transition">Apply
-        </button>
-        <a th:href="@{/scan}"
-           class="bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg px-4 py-2 transition">Back</a>
-    </form>
-</header>
+        <!-- Product information -->
+        <section>
+            <p class="text-gray-500 dark:text-gray-400 text-sm mb-1" th:text="${product.brandName}">Brand</p>
+            <h2 class="text-xl font-semibold mb-3" th:text="${product.displayName}">Display Name</h2>
 
-<!-- Main Content -->
-<main class="w-full max-w-4xl bg-white dark:bg-slate-800 rounded-xl shadow-md grid grid-cols-1 sm:grid-cols-[300px,1fr] gap-6 sm:gap-8 p-6 sm:p-8">
-    <img th:if="${product.imageUrl}" th:src="${product.imageUrl}" alt="Product image"
-         class="w-full h-64 object-cover rounded-xl bg-gray-100 dark:bg-slate-700"/>
+            <p class="text-gray-700 dark:text-gray-200 mb-2">
+                <span class="text-gray-500 dark:text-gray-400">GTIN:</span>
+                <strong th:text="${product.gtin}" class="ml-1">0000000000000</strong>
+                <span th:if="${product.verified}"
+                      class="ml-2 inline-block bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-200 text-xs font-semibold px-2 py-0.5 rounded-full">
+          Verified
+        </span>
+            </p>
 
-    <section>
-        <p class="text-gray-500 dark:text-gray-400 text-sm mb-1" th:text="${product.brandName}">Brand</p>
-        <h2 class="text-xl font-semibold mb-3" th:text="${product.displayName}">Display Name</h2>
+            <p class="text-gray-700 dark:text-gray-200 mb-4">
+                <span class="text-gray-500 dark:text-gray-400">Origin:</span>
+                <span th:text="${product.originCountry}" class="ml-1">-</span>
+            </p>
 
-        <p class="text-gray-700 dark:text-gray-200 mb-2">
-            <span class="text-gray-500 dark:text-gray-400">GTIN:</span>
-            <strong th:text="${product.gtin}" class="ml-1">0000000000000</strong>
-            <span th:if="${product.verified}"
-                  class="ml-2 inline-block bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-200 text-xs font-semibold px-2 py-0.5 rounded-full">Verified</span>
-        </p>
+            <article>
+                <h3 class="text-lg font-semibold mb-2">Description</h3>
+                <p th:text="${product.description}" class="text-gray-700 dark:text-gray-300 leading-relaxed">
+                    No description available.
+                </p>
+            </article>
 
-        <p class="text-gray-700 dark:text-gray-200 mb-4">
-            <span class="text-gray-500 dark:text-gray-400">Origin:</span>
-            <span th:text="${product.originCountry}" class="ml-1">-</span>
-        </p>
-
-        <article>
-            <h3 class="text-lg font-semibold mb-2">Description</h3>
-            <p th:text="${product.description}" class="text-gray-700 dark:text-gray-300 leading-relaxed">No description
-                available.</p>
-        </article>
+            <!-- Language form and back button -->
+            <form class="flex flex-wrap items-center gap-2 mt-6" th:action="@{|/p/${product.gtin}|}" method="get">
+                <label for="lang" class="text-sm text-gray-600 dark:text-gray-300">Language</label>
+                <select id="lang" name="lang"
+                        class="px-3 py-2 border border-gray-300 rounded-lg text-gray-800 bg-white dark:bg-slate-700 dark:text-gray-100 dark:border-slate-600">
+                    <option th:each="lc : ${T(com.scankorea.server.common.constant.LanguageCode).values()}"
+                            th:selected="${#strings.equals(lc, param.lang)}"
+                            th:value="${lc}"
+                            th:text="${lc}">EN
+                    </option>
+                </select>
+                <button type="submit"
+                        class="bg-brand hover:bg-blue-700 text-white font-semibold rounded-lg px-4 py-2 transition">
+                    Apply
+                </button>
+                <a th:href="@{/scan}"
+                   class="bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg px-4 py-2 transition">
+                    Back
+                </a>
+            </form>
+        </section>
     </section>
 </main>
 </body>
