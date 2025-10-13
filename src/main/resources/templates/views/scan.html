@@ -4,187 +4,46 @@
     <meta charset="utf-8"/>
     <title>ScanKorea · Barcode Helper</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-    <meta name="color-scheme" content="light dark"/>
+    <script src="https://cdn.tailwindcss.com"></script>
 
-    <style>
-        :root {
-            --brand: #1e88e5;
-            --brand-light: #e3f2fd;
-            --text: #222;
-            --muted: #666;
-            --radius: 14px;
-            --font: system-ui, -apple-system, "Noto Sans", "Noto Sans KR", sans-serif;
-            --fs: clamp(15px, 2.8vw, 17px);
-            --shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-        }
-
-        body {
-            margin: 0;
-            font-family: var(--font);
-            font-size: var(--fs);
-            background: linear-gradient(180deg, var(--brand-light) 0%, #fff 100%);
-            color: var(--text);
-            min-height: 100dvh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        header {
-            width: 100%;
-            max-width: 720px;
-            text-align: center;
-            padding: 2.5rem 1rem 1.5rem;
-        }
-
-        header h1 {
-            margin: 0;
-            font-size: clamp(22px, 6vw, 28px);
-            color: var(--brand);
-            font-weight: 700;
-        }
-
-        header p {
-            margin-top: .5rem;
-            color: var(--muted);
-            font-size: 0.95em;
-        }
-
-        main {
-            width: 100%;
-            max-width: 720px;
-            background: #fff;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            padding: 2rem 1.4rem 2.4rem;
-            margin: 0 1rem 2.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: .4rem;
-        }
-
-        select, input[type="file"] {
-            width: 100%;
-            padding: .9rem 1rem;
-            border: 1px solid #ddd;
-            border-radius: var(--radius);
-            font-size: 1rem;
-            background: #fafafa;
-        }
-
-        .drop-zone {
-            border: 2px dashed var(--brand);
-            border-radius: var(--radius);
-            padding: 2.2rem 1rem;
-            text-align: center;
-            color: var(--muted);
-            background: var(--brand-light);
-            transition: 0.2s ease;
-        }
-
-        .drop-zone.dragover {
-            background: color-mix(in oklab, var(--brand) 15%, white);
-            color: var(--text);
-        }
-
-        .file-name {
-            margin-top: .6rem;
-            font-size: .9em;
-            color: var(--muted);
-        }
-
-        button {
-            display: block;
-            width: 100%;
-            background: var(--brand);
-            color: #fff;
-            border: none;
-            border-radius: var(--radius);
-            padding: 1.1rem;
-            font-size: 1.05rem;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 1.8rem;
-            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-            transition: background 0.2s ease;
-        }
-
-        button:hover {
-            background: #1565c0;
-        }
-
-        .tip {
-            text-align: center;
-            color: var(--muted);
-            font-size: .9em;
-            margin-top: 1.2rem;
-        }
-
-        footer {
-            text-align: center;
-            font-size: .8em;
-            color: var(--muted);
-            padding: 1.5rem;
-        }
-
-        .error {
-            background: #ffebee;
-            border: 1px solid #ffcdd2;
-            color: #b00020;
-            padding: .9rem 1rem;
-            border-radius: var(--radius);
-            text-align: center;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            body {
-                background: linear-gradient(180deg, #102942 0%, #0a192f 100%);
-                color: #f5f5f5;
-            }
-
-            main {
-                background: #1c2b3a;
-                color: #f5f5f5;
-            }
-
-            select, input[type="file"] {
-                background: #223344;
-                border-color: #445566;
-                color: #f5f5f5;
-            }
-
-            .drop-zone {
-                border-color: #64b5f6;
-                background: #0f2438;
-            }
-
-            button {
-                background: #42a5f5;
-            }
-        }
-    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: '#1e88e5',
+                        'brand-light': '#e3f2fd',
+                    },
+                    borderRadius: {
+                        xl: '14px',
+                    },
+                },
+            },
+        };
+    </script>
 </head>
-<body>
-<header>
-    <h1>ScanKorea</h1>
-    <p>Your travel barcode helper</p>
+<body class="min-h-screen flex flex-col items-center bg-gradient-to-b from-brand-light to-white text-gray-800 font-sans">
+<!-- Header -->
+<header class="w-full max-w-md text-center py-10 px-4">
+    <h1 class="text-3xl font-bold text-brand">ScanKorea</h1>
+    <p class="text-gray-600 mt-2 text-base">Your travel barcode helper</p>
 </header>
 
-<main role="main">
-    <div th:if="${error}" class="error" th:text="${error}">
+<!-- Main -->
+<main role="main" class="w-full max-w-md bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 sm:p-8 mb-10 mx-4">
+    <!-- Error message -->
+    <div th:if="${error}" class="bg-red-50 border border-red-200 text-red-700 text-center rounded-lg py-3 px-4 mb-4"
+         th:text="${error}">
         There was an error scanning the barcode.
     </div>
 
-    <form th:action="@{/scan}" method="post" enctype="multipart/form-data">
+    <form th:action="@{/scan}" method="post" enctype="multipart/form-data" class="space-y-6">
+        <!-- Language selection -->
         <div>
-            <label for="lang">🌍 Choose Language</label>
-            <select id="lang" name="lang" required>
+            <label for="lang" class="block font-semibold mb-2 text-gray-700 dark:text-gray-200">🌍 Choose
+                Language</label>
+            <select id="lang" name="lang" required
+                    class="w-full border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 text-gray-800 dark:text-gray-100 rounded-lg p-3">
                 <option th:each="lc : ${T(com.scankorea.server.common.constant.LanguageCode).values()}"
                         th:value="${lc}"
                         th:text="${lc}"
@@ -193,25 +52,36 @@
             </select>
         </div>
 
+        <!-- Drop zone -->
         <div>
-            <label for="file">📸 Upload or take a photo</label>
-            <div id="dropZone" class="drop-zone">
-                Tap to select or drag a photo here
-                <div id="fileName" class="file-name">No file selected</div>
+            <label for="file" class="block font-semibold mb-2 text-gray-700 dark:text-gray-200">📸 Upload or take a
+                photo</label>
+            <div id="dropZone"
+                 class="border-2 border-dashed border-brand bg-brand-light/40 text-gray-500 text-center rounded-xl py-10 px-4 transition hover:bg-blue-50 cursor-pointer">
+                <div>Tap to select or drag a photo here</div>
+                <div id="fileName" class="text-sm text-gray-500 mt-2">No file selected</div>
             </div>
             <input id="file" type="file" name="file" accept="image/*" capture="environment" hidden required>
         </div>
 
-        <button type="submit">Scan Barcode</button>
+        <!-- Submit button -->
+        <button type="submit"
+                class="w-full bg-brand hover:bg-blue-700 text-white font-semibold rounded-xl py-3 mt-6 shadow-sm transition">
+            Scan Barcode
+        </button>
     </form>
 
-    <p class="tip">💡 Tip: Use clear lighting and keep the barcode centered.</p>
+    <p class="text-center text-sm text-gray-500 mt-6">
+        💡 Tip: Use clear lighting and keep the barcode centered.
+    </p>
 </main>
 
-<footer>
+<!-- Footer -->
+<footer class="text-center text-xs text-gray-500 dark:text-gray-400 pb-6">
     © 2025 ScanKorea · Helping travelers read Korean products
 </footer>
 
+<!-- Script -->
 <script>
     const drop = document.getElementById('dropZone');
     const input = document.getElementById('file');
@@ -220,12 +90,12 @@
     drop.addEventListener('click', () => input.click());
     drop.addEventListener('dragover', (e) => {
         e.preventDefault();
-        drop.classList.add('dragover');
+        drop.classList.add('bg-blue-100');
     });
-    drop.addEventListener('dragleave', () => drop.classList.remove('dragover'));
+    drop.addEventListener('dragleave', () => drop.classList.remove('bg-blue-100'));
     drop.addEventListener('drop', (e) => {
         e.preventDefault();
-        drop.classList.remove('dragover');
+        drop.classList.remove('bg-blue-100');
         const file = e.dataTransfer.files[0];
         if (file) {
             input.files = e.dataTransfer.files;
