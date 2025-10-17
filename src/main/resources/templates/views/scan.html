@@ -162,6 +162,20 @@
         const qs = (s, r = document) => r.querySelector(s);
         const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
 
+        // Helper: swap whole document with returned HTML from Spring MVC (view name -> HTML)
+        async function submitAndReplace(formData, action) {
+            const res = await fetch(action || '/scan', {method: 'POST', body: formData});
+            const html = await res.text();
+            document.open();
+            document.write(html);
+            document.close();
+        }
+
+        // Helper: convert Blob to File
+        function asFile(blob, filename = `image-${Date.now()}.jpg`) {
+            return new File([blob], filename, {type: 'image/jpeg'});
+        }
+
         // --- Tab logic ---
         const tabUpload = qs('#tab-upload');
         const tabCamera = qs('#tab-camera');
@@ -193,13 +207,10 @@
 
         async function blobFromSource(src, opts = {}) {
             const {maxDim = 1600, quality = 0.85} = opts;
-            let bmp, w, h;
             if (src instanceof File || src instanceof Blob) {
                 if (window.createImageBitmap) {
-                    // Respect EXIF orientation when available
-                    bmp = await createImageBitmap(src, {imageOrientation: 'from-image'});
-                    w = bmp.width;
-                    h = bmp.height;
+                    const bmp = await createImageBitmap(src, {imageOrientation: 'from-image'});
+                    const w = bmp.width, h = bmp.height;
                     const scale = Math.min(1, maxDim / Math.max(w, h));
                     const cw = Math.max(1, Math.round(w * scale));
                     const ch = Math.max(1, Math.round(h * scale));
@@ -209,7 +220,6 @@
                     ctx.drawImage(bmp, 0, 0, cw, ch);
                     bmp.close && bmp.close();
                 } else {
-                    // Fallback: <img> (may ignore EXIF in some browsers)
                     const url = URL.createObjectURL(src);
                     const img = await new Promise((res, rej) => {
                         const i = new Image();
@@ -217,8 +227,7 @@
                         i.onerror = rej;
                         i.src = url;
                     });
-                    w = img.naturalWidth;
-                    h = img.naturalHeight;
+                    const w = img.naturalWidth, h = img.naturalHeight;
                     const scale = Math.min(1, maxDim / Math.max(w, h));
                     const cw = Math.max(1, Math.round(w * scale));
                     const ch = Math.max(1, Math.round(h * scale));
@@ -229,9 +238,7 @@
                     URL.revokeObjectURL(url);
                 }
             } else if (src instanceof HTMLVideoElement) {
-                // Live capture path
-                const vw = src.videoWidth;
-                const vh = src.videoHeight;
+                const vw = src.videoWidth, vh = src.videoHeight;
                 const scale = Math.min(1, maxDim / Math.max(vw, vh));
                 const cw = Math.max(1, Math.round(vw * scale));
                 const ch = Math.max(1, Math.round(vh * scale));
@@ -275,10 +282,14 @@
             drop.classList.remove('bg-brand/10');
             const file = e.dataTransfer.files && e.dataTransfer.files[0];
             if (file) {
-                inputUpload.files = e.dataTransfer.files;
-                fileNameEl.textContent = file.name;
-                galleryProcessed = await blobFromSource(file, {maxDim: 1600, quality: 0.85});
-                showGalleryPreview(galleryProcessed.previewURL);
+                const processed = await blobFromSource(file, {maxDim: 1600, quality: 0.85});
+                galleryProcessed = processed;
+                // Replace the file input with optimized File so native form submit hits Spring controller directly
+                const dt = new DataTransfer();
+                dt.items.add(asFile(processed.blob, file.name.replace(/\.[^.]+$/, '') + '-optimized.jpg'));
+                inputUpload.files = dt.files;
+                fileNameEl.textContent = dt.files[0].name;
+                showGalleryPreview(processed.previewURL);
             }
         });
 
@@ -286,51 +297,15 @@
             const file = inputUpload.files && inputUpload.files[0];
             fileNameEl.textContent = file ? file.name : 'No file selected';
             if (file) {
-                galleryProcessed = await blobFromSource(file, {maxDim: 1600, quality: 0.85});
-                showGalleryPreview(galleryProcessed.previewURL);
+                const processed = await blobFromSource(file, {maxDim: 1600, quality: 0.85});
+                galleryProcessed = processed;
+                const dt = new DataTransfer();
+                dt.items.add(asFile(processed.blob, file.name.replace(/\.[^.]+$/, '') + '-optimized.jpg'));
+                inputUpload.files = dt.files;
+                fileNameEl.textContent = dt.files[0].name;
+                showGalleryPreview(processed.previewURL);
             } else {
                 showGalleryPreview(null);
-            }
-        });
-
-        // Intercept Gallery form submit to send processed blob
-        formUpload.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const lang = qs('#lang-upload').value;
-            const file = inputUpload.files && inputUpload.files[0];
-            if (!file) {
-                alert('Please select a file.');
-                return;
-            }
-            if (!galleryProcessed) {
-                galleryProcessed = await blobFromSource(file, {maxDim: 1600, quality: 0.85});
-            }
-            const formData = new FormData();
-            formData.append('lang', lang);
-            formData.append('file', galleryProcessed.blob, file.name.replace(/\.[^.]+$/, '') + '-optimized.jpg');
-            const submitBtn = formUpload.querySelector('button[type="submit"]');
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Uploading...';
-            try {
-                const res = await fetch(formUpload.getAttribute('action') || '/scan', {method: 'POST', body: formData});
-                if (res.redirected) {
-                    window.location.href = res.url;
-                    return;
-                }
-                if (res.ok) {
-                    const data = await res.json().catch(() => ({}));
-                    if (data && data.redirect) {
-                        window.location.href = data.redirect;
-                    } else {
-                        submitBtn.textContent = 'Uploaded! Processing...';
-                    }
-                } else {
-                    throw new Error('Upload failed');
-                }
-            } catch (err) {
-                alert('Upload failed. Please try again or use Camera.');
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Scan Barcode';
             }
         });
 
@@ -352,7 +327,6 @@
         let capturedBlob = null;
 
         function setLiveState(state) {
-            // state: 'checking' | 'ready' | 'unsupported' | 'active' | 'captured'
             const map = {
                 checking: 'Checking...',
                 ready: 'Ready',
@@ -432,7 +406,6 @@
             if (!video.videoWidth) return;
             const processed = await downscaleFromVideo(video);
             capturedBlob = processed.blob;
-            // Show preview image (processed, orientation-consistent)
             previewImg.src = processed.previewURL;
             previewWrap.classList.remove('hidden');
             setLiveState('captured');
@@ -452,37 +425,15 @@
             video.play();
         });
 
-        // Submit capturedBlob to /scan with language
+        // Submit capturedBlob to /scan with language -> replace document with returned HTML view
         btnUploadCapture.addEventListener('click', async () => {
             if (!capturedBlob) return;
             const lang = qs('#lang-camera').value;
             const formData = new FormData();
             formData.append('lang', lang);
-            formData.append('file', capturedBlob, `capture-${Date.now()}.jpg`);
-            btnUploadCapture.disabled = true;
-            btnUploadCapture.textContent = 'Uploading...';
-            try {
-                const res = await fetch((document.getElementById('form-upload')?.getAttribute('action')) || '/scan', {
-                    method: 'POST',
-                    body: formData
-                });
-                if (res.redirected) {
-                    window.location.href = res.url;
-                    return;
-                }
-                if (res.ok) {
-                    const data = await res.json().catch(() => ({}));
-                    if (data?.redirect) window.location.href = data.redirect; else btnUploadCapture.textContent = 'Uploaded! Processing...';
-                } else {
-                    throw new Error('Upload failed');
-                }
-            } catch (e) {
-                alert('Upload failed. Please try the native capture option below or choose Gallery.');
-                btnUploadCapture.disabled = false;
-                btnUploadCapture.textContent = 'Upload & Scan';
-            } finally {
-                stopLive();
-            }
+            formData.append('file', asFile(capturedBlob, `capture-${Date.now()}.jpg`));
+            await submitAndReplace(formData, (document.getElementById('form-upload')?.getAttribute('action')) || '/scan');
+            stopLive();
         });
 
         // Keep native capture language in sync
@@ -494,61 +445,30 @@
         langCameraSel.addEventListener('change', syncLang);
         syncLang();
 
-        // Native capture preview + processed upload
+        // Native capture preview and client-side optimization, then native form submit
         const nativeForm = qs('#form-native');
         const nativeInput = qs('#file-native');
         const nativePreviewWrap = qs('#nativePreviewWrap');
         const nativePreview = qs('#nativePreview');
-        let nativeProcessed = null;
 
         if (nativeInput) {
             nativeInput.addEventListener('change', async () => {
-                const file = nativeInput.files && nativeInput.files[0];
-                if (!file) {
+                const orig = nativeInput.files && nativeInput.files[0];
+                if (!orig) {
                     nativePreviewWrap.classList.add('hidden');
-                    nativeProcessed = null;
                     return;
                 }
-                nativeProcessed = await blobFromSource(file, {maxDim: 1600, quality: 0.85});
-                nativePreview.src = nativeProcessed.previewURL;
+                const processed = await blobFromSource(orig, {maxDim: 1600, quality: 0.85});
+                nativePreview.src = processed.previewURL;
                 nativePreviewWrap.classList.remove('hidden');
+                // Replace the file input with optimized file so form posts directly to Spring controller
+                const dt = new DataTransfer();
+                dt.items.add(asFile(processed.blob, `capture-${Date.now()}.jpg`));
+                nativeInput.files = dt.files;
             });
         }
 
-        nativeForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const lang = langNative.value;
-            const file = nativeInput.files && nativeInput.files[0];
-            if (!file) {
-                alert('Please take a photo.');
-                return;
-            }
-            if (!nativeProcessed) {
-                nativeProcessed = await blobFromSource(file, {maxDim: 1600, quality: 0.85});
-            }
-            const formData = new FormData();
-            formData.append('lang', lang);
-            formData.append('file', nativeProcessed.blob, `capture-${Date.now()}.jpg`);
-            const submitBtn = nativeForm.querySelector('button[type="submit"]');
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Uploading...';
-            try {
-                const res = await fetch(nativeForm.getAttribute('action') || '/scan', {method: 'POST', body: formData});
-                if (res.redirected) {
-                    window.location.href = res.url;
-                    return;
-                }
-                if (res.ok) {
-                    const data = await res.json().catch(() => ({}));
-                    if (data?.redirect) window.location.href = data.redirect; else submitBtn.textContent = 'Uploaded! Processing...';
-                } else {
-                    throw new Error('Upload failed');
-                }
-            } catch (err) {
-                alert('Upload failed. Please try again.');
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Scan with Native Capture';
-            }
+        nativeForm.addEventListener('submit', () => { /* allow normal form POST -> controller returns a view */
         });
 
         // Run capability check on first open of Camera tab
