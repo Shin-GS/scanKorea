@@ -3,10 +3,11 @@
 <head th:replace="~{views/layout :: head}">
     <!--/*@thymesVar id="pageTitle" type="java.lang.String"*/-->
     <title th:text="${pageTitle} ?: 'ScanKorea'">ScanKorea</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
 </head>
-<body>
+<body class="bg-gray-50 dark:bg-slate-900">
 <main th:fragment="~{views/layout :: content}">
-    <section class="w-full max-w-md bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 sm:p-8 mb-10 mx-auto">
+    <section class="w-full max-w-md bg-white dark:bg-slate-800 rounded-2xl shadow-md p-5 sm:p-6 md:p-8 mx-auto my-6">
         <!-- Error message -->
         <div th:if="${error}"
              class="bg-red-50 border border-red-200 text-red-700 text-center rounded-lg py-3 px-4 mb-4"
@@ -14,14 +15,30 @@
             There was an error scanning the barcode.
         </div>
 
-        <!-- Upload form -->
-        <form th:action="@{/scan}" method="post" enctype="multipart/form-data" class="space-y-6">
+        <h1 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">Scan a Barcode / QR</h1>
+        <p class="text-sm text-gray-500 mb-4">Choose a method below. Works on iOS & Android in modern mobile
+            browsers.</p>
+
+        <!-- Method selector -->
+        <div class="grid grid-cols-2 gap-2 mb-4" role="tablist" aria-label="Upload method">
+            <button id="tab-upload" data-tab="upload"
+                    class="tab-btn aria-selected:bg-brand aria-selected:text-white bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-gray-100 rounded-xl py-2 font-medium focus:outline-none focus:ring"
+                    aria-selected="true" role="tab">Gallery
+            </button>
+            <button id="tab-camera" data-tab="camera"
+                    class="tab-btn bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-gray-100 rounded-xl py-2 font-medium focus:outline-none focus:ring"
+                    aria-selected="false" role="tab">Camera
+            </button>
+        </div>
+
+        <!-- Upload: Gallery file input (universal) -->
+        <form id="form-upload" th:action="@{/scan}" method="post" enctype="multipart/form-data" class="space-y-4"
+              role="tabpanel" aria-labelledby="tab-upload">
             <!-- Language selection -->
             <div>
-                <label for="lang" class="block font-semibold mb-2 text-gray-700 dark:text-gray-200">
-                    🌍 Choose Language
-                </label>
-                <select id="lang" name="lang" required
+                <label for="lang-upload" class="block font-semibold mb-2 text-gray-700 dark:text-gray-200">🌍 Choose
+                    Language</label>
+                <select id="lang-upload" name="lang" required
                         class="w-full border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 text-gray-800 dark:text-gray-100 rounded-lg p-3">
                     <option th:each="lc : ${T(com.scankorea.server.common.constant.LanguageCode).values()}"
                             th:value="${lc}"
@@ -31,56 +48,366 @@
                 </select>
             </div>
 
-            <!-- Drop zone -->
             <div>
-                <label for="file" class="block font-semibold mb-2 text-gray-700 dark:text-gray-200">
-                    📸 Upload or take a photo
-                </label>
+                <label for="file-upload" class="block font-semibold mb-2 text-gray-700 dark:text-gray-200">📁 Upload from
+                    Gallery</label>
                 <div id="dropZone"
-                     class="border-2 border-dashed border-brand bg-brand-light/40 text-gray-500 text-center rounded-xl py-10 px-4 transition hover:bg-blue-50 cursor-pointer">
+                     class="border-2 border-dashed border-brand/70 bg-brand/5 text-gray-500 text-center rounded-xl py-10 px-4 transition hover:bg-brand/10 cursor-pointer">
                     <div>Tap to select or drag a photo here</div>
                     <div id="fileName" class="text-sm text-gray-500 mt-2">No file selected</div>
                 </div>
-                <input id="file" type="file" name="file" accept="image/*" capture="environment" hidden required>
+                <!-- Standard file input (gallery) -->
+                <input id="file-upload" type="file" name="file" accept="image/*" hidden required>
             </div>
 
-            <!-- Submit button -->
             <button type="submit"
-                    class="w-full bg-brand hover:bg-blue-700 text-white font-semibold rounded-xl py-3 mt-6 shadow-sm transition">
+                    class="w-full bg-brand hover:bg-blue-700 text-white font-semibold rounded-xl py-3 mt-2 shadow-sm transition">
                 Scan Barcode
             </button>
         </form>
 
-        <p class="text-center text-sm text-gray-500 mt-6">
-            Tip: Use clear lighting and keep the barcode centered.
-        </p>
+        <!-- Camera: two strategies -->
+        <!-- Strategy A: In-browser live camera via getUserMedia (best UX) -->
+        <!-- Strategy B: Native file input with capture attribute as robust fallback (esp. iOS Safari) -->
+        <section id="panel-camera" class="hidden space-y-4" role="tabpanel" aria-labelledby="tab-camera">
+            <!-- Language selection (camera) -->
+            <div>
+                <label for="lang-camera" class="block font-semibold mb-2 text-gray-700 dark:text-gray-200">🌍 Choose
+                    Language</label>
+                <select id="lang-camera"
+                        class="w-full border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 text-gray-800 dark:text-gray-100 rounded-lg p-3">
+                    <option th:each="lc : ${T(com.scankorea.server.common.constant.LanguageCode).values()}"
+                            th:value="${lc}"
+                            th:text="${lc}"
+                            th:attrappend="selected=${lc.name() == 'EN'}">EN
+                    </option>
+                </select>
+            </div>
+
+            <!-- A. Live camera (if supported) -->
+            <div id="liveWrap" class="rounded-xl border border-gray-200 dark:border-slate-700 p-3">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="font-semibold text-gray-700 dark:text-gray-200">Live Camera</div>
+                    <span id="liveBadge"
+                          class="text-xs px-2 py-1 rounded bg-gray-100 dark:bg-slate-700">Checking...</span>
+                </div>
+                <div class="relative aspect-[3/4] rounded-xl overflow-hidden bg-black">
+                    <video id="video" playsinline autoplay class="w-full h-full object-cover"></video>
+                    <!-- framing guides -->
+                    <div class="pointer-events-none absolute inset-0 grid grid-cols-3 grid-rows-3">
+                        <div class="border border-white/20 col-span-3 row-span-3"></div>
+                    </div>
+                </div>
+                <div class="flex gap-2 mt-3">
+                    <button id="btnStart"
+                            class="flex-1 rounded-xl py-2 font-semibold bg-gray-900 text-white disabled:opacity-50">
+                        Start
+                    </button>
+                    <button id="btnCapture"
+                            class="flex-1 rounded-xl py-2 font-semibold bg-brand text-white disabled:opacity-50"
+                            disabled>Capture
+                    </button>
+                    <button id="btnRetake"
+                            class="flex-1 rounded-xl py-2 font-semibold bg-gray-200 dark:bg-slate-700 disabled:opacity-50"
+                            disabled>Retake
+                    </button>
+                </div>
+                <canvas id="canvas" class="hidden"></canvas>
+            </div>
+
+            <div id="previewWrap" class="hidden">
+                <img id="previewImg" alt="Captured preview" class="w-full rounded-xl"/>
+            </div>
+
+            <!-- Submit captured image to /scan -->
+            <button id="btnUploadCapture"
+                    class="w-full bg-brand hover:bg-blue-700 text-white font-semibold rounded-xl py-3 shadow-sm transition disabled:opacity-50"
+                    disabled>
+                Upload & Scan
+            </button>
+
+            <!-- B. Native capture fallback (robust on iOS/Android) -->
+            <div class="pt-3 border-t border-dashed border-gray-300 dark:border-slate-700">
+                <p class="text-xs text-gray-500 mb-2">If live camera isn’t supported, use native capture:</p>
+                <form id="form-native" th:action="@{/scan}" method="post" enctype="multipart/form-data"
+                      class="space-y-2">
+                    <input type="hidden" name="lang" id="lang-native"/>
+                    <label for="file-native" class="block font-medium text-gray-700 dark:text-gray-200">Native
+                        Camera</label>
+                    <!-- Important: capture attribute helps open camera on mobile browsers -->
+                    <input id="file-native" type="file" name="file" accept="image/*;capture=camera"
+                           capture="environment" class="block w-full text-sm"/>
+                    <button type="submit" class="w-full bg-gray-900 text-white rounded-xl py-2 font-semibold">Scan with
+                        Native Capture
+                    </button>
+                </form>
+                <p id="fallbackNote" class="text-[11px] text-amber-600 mt-1 hidden">Live camera not available. Using
+                    native capture instead.</p>
+            </div>
+        </section>
+
+        <p class="text-center text-xs text-gray-500 mt-5">Tip: Use clear lighting and keep the code centered.</p>
     </section>
 
-    <!-- File upload script -->
     <script>
-        const drop = document.getElementById('dropZone');
-        const input = document.getElementById('file');
-        const fileName = document.getElementById('fileName');
+        // --- Utilities ---
+        const qs = (s, r = document) => r.querySelector(s);
+        const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
 
-        drop.addEventListener('click', () => input.click());
+        // --- Tab logic ---
+        const tabUpload = qs('#tab-upload');
+        const tabCamera = qs('#tab-camera');
+        const formUpload = qs('#form-upload');
+        const panelCamera = qs('#panel-camera');
+
+        function selectTab(which) {
+            if (which === 'upload') {
+                formUpload.classList.remove('hidden');
+                panelCamera.classList.add('hidden');
+                tabUpload.setAttribute('aria-selected', 'true');
+                tabCamera.setAttribute('aria-selected', 'false');
+            } else {
+                formUpload.classList.add('hidden');
+                panelCamera.classList.remove('hidden');
+                tabUpload.setAttribute('aria-selected', 'false');
+                tabCamera.setAttribute('aria-selected', 'true');
+            }
+        }
+
+        tabUpload.addEventListener('click', () => selectTab('upload'));
+        tabCamera.addEventListener('click', () => selectTab('camera'));
+
+        // Default to upload tab
+        selectTab('upload');
+
+        // --- Drag & drop for Gallery ---
+        const drop = qs('#dropZone');
+        const inputUpload = qs('#file-upload');
+        const fileNameEl = qs('#fileName');
+
+        drop.addEventListener('click', () => inputUpload.click());
         drop.addEventListener('dragover', (e) => {
             e.preventDefault();
-            drop.classList.add('bg-blue-100');
+            drop.classList.add('bg-brand/10');
         });
-        drop.addEventListener('dragleave', () => drop.classList.remove('bg-blue-100'));
+        drop.addEventListener('dragleave', () => drop.classList.remove('bg-brand/10'));
         drop.addEventListener('drop', (e) => {
             e.preventDefault();
-            drop.classList.remove('bg-blue-100');
-            const file = e.dataTransfer.files[0];
+            drop.classList.remove('bg-brand/10');
+            const file = e.dataTransfer.files?.[0];
             if (file) {
-                input.files = e.dataTransfer.files;
-                fileName.textContent = file.name;
+                inputUpload.files = e.dataTransfer.files;
+                fileNameEl.textContent = file.name;
             }
         });
-        input.addEventListener('change', () => {
-            const file = input.files[0];
-            fileName.textContent = file ? file.name : 'No file selected';
+        inputUpload.addEventListener('change', () => {
+            const file = inputUpload.files?.[0];
+            fileNameEl.textContent = file ? file.name : 'No file selected';
         });
+
+        // --- Camera: capability detection & UX ---
+        const isSecureContext = window.isSecureContext === true; // HTTPS required for getUserMedia
+        const hasMediaDevices = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+
+        const liveBadge = qs('#liveBadge');
+        const btnStart = qs('#btnStart');
+        const btnCapture = qs('#btnCapture');
+        const btnRetake = qs('#btnRetake');
+        const btnUploadCapture = qs('#btnUploadCapture');
+        const video = qs('#video');
+        const canvas = qs('#canvas');
+        const previewWrap = qs('#previewWrap');
+        const previewImg = qs('#previewImg');
+        const liveWrap = qs('#liveWrap');
+        const fallbackNote = qs('#fallbackNote');
+
+        let stream = null;
+        let capturedBlob = null;
+
+        function setLiveState(state) {
+            // state: 'checking' | 'ready' | 'unsupported' | 'active' | 'captured'
+            const map = {
+                checking: 'Checking...',
+                ready: 'Ready',
+                unsupported: 'Unavailable',
+                active: 'Live',
+                captured: 'Captured'
+            };
+            liveBadge.textContent = map[state] || '...';
+        }
+
+        async function checkCameraSupport() {
+            setLiveState('checking');
+            if (!isSecureContext || !hasMediaDevices) {
+                setLiveState('unsupported');
+                disableLiveCameraUI();
+                return false;
+            }
+            // Try requesting minimal camera access to validate capability
+            try {
+                const test = await navigator.mediaDevices.getUserMedia({video: true});
+                test.getTracks().forEach(t => t.stop());
+                setLiveState('ready');
+                enableLiveCameraUI();
+                return true;
+            } catch (e) {
+                setLiveState('unsupported');
+                disableLiveCameraUI(e);
+                return false;
+            }
+        }
+
+        function enableLiveCameraUI() {
+            btnStart.disabled = false;
+            fallbackNote.classList.add('hidden');
+        }
+
+        function disableLiveCameraUI(err) {
+            btnStart.disabled = true;
+            btnCapture.disabled = true;
+            btnRetake.disabled = true;
+            btnUploadCapture.disabled = true;
+            // Emphasize native capture fallback
+            fallbackNote.classList.remove('hidden');
+        }
+
+        async function startLive() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: {facingMode: {ideal: 'environment'}},
+                    audio: false
+                });
+                video.srcObject = stream;
+                setLiveState('active');
+                btnCapture.disabled = false;
+                btnRetake.disabled = true;
+                btnUploadCapture.disabled = true;
+                previewWrap.classList.add('hidden');
+                capturedBlob = null;
+            } catch (e) {
+                setLiveState('unsupported');
+                disableLiveCameraUI(e);
+            }
+        }
+
+        function stopLive() {
+            if (stream) {
+                stream.getTracks().forEach(t => t.stop());
+                stream = null;
+            }
+        }
+
+        function downscaleAndCompress(videoEl) {
+            // Create a canvas at a mobile-friendly resolution to reduce payload size
+            const maxDim = 1600; // pixels
+            const vw = videoEl.videoWidth;
+            const vh = videoEl.videoHeight;
+            const scale = Math.min(1, maxDim / Math.max(vw, vh));
+            const cw = Math.max(1, Math.round(vw * scale));
+            const ch = Math.max(1, Math.round(vh * scale));
+            canvas.width = cw;
+            canvas.height = ch;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(videoEl, 0, 0, cw, ch);
+            return new Promise((resolve) => {
+                canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.85);
+            });
+        }
+
+        btnStart.addEventListener('click', startLive);
+
+        btnCapture.addEventListener('click', async () => {
+            if (!video.videoWidth) return;
+            capturedBlob = await downscaleAndCompress(video);
+            // Show preview image
+            previewImg.src = URL.createObjectURL(capturedBlob);
+            previewWrap.classList.remove('hidden');
+            setLiveState('captured');
+            btnRetake.disabled = false;
+            btnUploadCapture.disabled = false;
+            btnCapture.disabled = true;
+            // Pause stream preview but keep tracks running until upload/retake
+            video.pause();
+        });
+
+        btnRetake.addEventListener('click', async () => {
+            if (!stream) await startLive();
+            previewWrap.classList.add('hidden');
+            btnCapture.disabled = false;
+            btnRetake.disabled = true;
+            btnUploadCapture.disabled = true;
+            setLiveState('active');
+            video.play();
+        });
+
+        // Submit capturedBlob to /scan with language
+        btnUploadCapture.addEventListener('click', async () => {
+            if (!capturedBlob) return;
+            const lang = qs('#lang-camera').value;
+            const formData = new FormData();
+            formData.append('lang', lang);
+            formData.append('file', capturedBlob, `capture-${Date.now()}.jpg`);
+
+            // Disable UI while uploading
+            btnUploadCapture.disabled = true;
+            btnUploadCapture.textContent = 'Uploading...';
+
+            try {
+                const res = await fetch((document.getElementById('form-upload')?.getAttribute('action')) || '/scan', {
+                    method: 'POST', body: formData
+                });
+                // If server redirects to a result page, follow it
+                if (res.redirected) {
+                    window.location.href = res.url;
+                    return;
+                }
+                if (res.ok) {
+                    // Assume JSON with redirect or message
+                    const data = await res.json().catch(() => ({}));
+                    if (data?.redirect) {
+                        window.location.href = data.redirect;
+                    } else {
+                        btnUploadCapture.textContent = 'Uploaded! Processing...';
+                    }
+                } else {
+                    throw new Error('Upload failed');
+                }
+            } catch (e) {
+                alert('Upload failed. Please try the native capture option below or choose Gallery.');
+                btnUploadCapture.disabled = false;
+                btnUploadCapture.textContent = 'Upload & Scan';
+            } finally {
+                stopLive();
+            }
+        });
+
+        // Keep native capture language in sync
+        const langCameraSel = qs('#lang-camera');
+        const langNative = qs('#lang-native');
+        const syncLang = () => {
+            langNative.value = langCameraSel.value;
+        };
+        langCameraSel.addEventListener('change', syncLang);
+        syncLang();
+
+        // Run capability check on first open of Camera tab
+        let checked = false;
+        tabCamera.addEventListener('click', async () => {
+            if (!checked) {
+                checked = true;
+                await checkCameraSupport();
+            }
+        });
+
+        // If user lands directly on Camera tab via deep-linking, still check
+        if (window.location.hash === '#camera') {
+            selectTab('camera');
+            checkCameraSupport();
+        }
+
+        // Clean up camera on page unload / tab switch
+        window.addEventListener('pagehide', stopLive);
+        tabUpload.addEventListener('click', stopLive);
     </script>
 </main>
 </body>
