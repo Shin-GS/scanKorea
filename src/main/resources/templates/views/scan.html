@@ -56,6 +56,10 @@
                     <div>Tap to select or drag a photo here</div>
                     <div id="fileName" class="text-sm text-gray-500 mt-2">No file selected</div>
                 </div>
+                <!-- Gallery preview -->
+                <div id="galleryPreviewWrap" class="hidden mt-3">
+                    <img id="galleryPreview" alt="Selected image preview" class="w-full rounded-xl"/>
+                </div>
                 <!-- Standard file input (gallery) -->
                 <input id="file-upload" type="file" name="file" accept="image/*" hidden required>
             </div>
@@ -137,6 +141,10 @@
                     <!-- Important: capture attribute helps open camera on mobile browsers -->
                     <input id="file-native" type="file" name="file" accept="image/*;capture=camera"
                            capture="environment" class="block w-full text-sm"/>
+                    <!-- Native capture preview -->
+                    <div id="nativePreviewWrap" class="hidden mt-2">
+                        <img id="nativePreview" alt="Captured image preview" class="w-full rounded-xl"/>
+                    </div>
                     <button type="submit" class="w-full bg-gray-900 text-white rounded-xl py-2 font-semibold">Scan with
                         Native Capture
                     </button>
@@ -180,10 +188,81 @@
         // Default to upload tab
         selectTab('upload');
 
+        // --- EXIF-aware downscale utility (for File or HTMLVideoElement) ---
+        const canvas = qs('#canvas');
+
+        async function blobFromSource(src, opts = {}) {
+            const {maxDim = 1600, quality = 0.85} = opts;
+            let bmp, w, h;
+            if (src instanceof File || src instanceof Blob) {
+                if (window.createImageBitmap) {
+                    // Respect EXIF orientation when available
+                    bmp = await createImageBitmap(src, {imageOrientation: 'from-image'});
+                    w = bmp.width;
+                    h = bmp.height;
+                    const scale = Math.min(1, maxDim / Math.max(w, h));
+                    const cw = Math.max(1, Math.round(w * scale));
+                    const ch = Math.max(1, Math.round(h * scale));
+                    canvas.width = cw;
+                    canvas.height = ch;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(bmp, 0, 0, cw, ch);
+                    bmp.close && bmp.close();
+                } else {
+                    // Fallback: <img> (may ignore EXIF in some browsers)
+                    const url = URL.createObjectURL(src);
+                    const img = await new Promise((res, rej) => {
+                        const i = new Image();
+                        i.onload = () => res(i);
+                        i.onerror = rej;
+                        i.src = url;
+                    });
+                    w = img.naturalWidth;
+                    h = img.naturalHeight;
+                    const scale = Math.min(1, maxDim / Math.max(w, h));
+                    const cw = Math.max(1, Math.round(w * scale));
+                    const ch = Math.max(1, Math.round(h * scale));
+                    canvas.width = cw;
+                    canvas.height = ch;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, cw, ch);
+                    URL.revokeObjectURL(url);
+                }
+            } else if (src instanceof HTMLVideoElement) {
+                // Live capture path
+                const vw = src.videoWidth;
+                const vh = src.videoHeight;
+                const scale = Math.min(1, maxDim / Math.max(vw, vh));
+                const cw = Math.max(1, Math.round(vw * scale));
+                const ch = Math.max(1, Math.round(vh * scale));
+                canvas.width = cw;
+                canvas.height = ch;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(src, 0, 0, cw, ch);
+            } else {
+                throw new Error('Unsupported source for blobFromSource');
+            }
+            const blob = await new Promise((resolve) => canvas.toBlob((b) => resolve(b), 'image/jpeg', quality));
+            const previewURL = canvas.toDataURL('image/jpeg', Math.min(quality + 0.1, 0.92));
+            return {blob, previewURL};
+        }
+
         // --- Drag & drop for Gallery ---
         const drop = qs('#dropZone');
         const inputUpload = qs('#file-upload');
         const fileNameEl = qs('#fileName');
+        const galleryPreviewWrap = qs('#galleryPreviewWrap');
+        const galleryPreview = qs('#galleryPreview');
+        let galleryProcessed = null; // {blob, previewURL}
+
+        function showGalleryPreview(previewURL) {
+            if (!previewURL) {
+                galleryPreviewWrap.classList.add('hidden');
+                return;
+            }
+            galleryPreview.src = previewURL;
+            galleryPreviewWrap.classList.remove('hidden');
+        }
 
         drop.addEventListener('click', () => inputUpload.click());
         drop.addEventListener('dragover', (e) => {
@@ -191,18 +270,68 @@
             drop.classList.add('bg-brand/10');
         });
         drop.addEventListener('dragleave', () => drop.classList.remove('bg-brand/10'));
-        drop.addEventListener('drop', (e) => {
+        drop.addEventListener('drop', async (e) => {
             e.preventDefault();
             drop.classList.remove('bg-brand/10');
-            const file = e.dataTransfer.files?.[0];
+            const file = e.dataTransfer.files && e.dataTransfer.files[0];
             if (file) {
                 inputUpload.files = e.dataTransfer.files;
                 fileNameEl.textContent = file.name;
+                galleryProcessed = await blobFromSource(file, {maxDim: 1600, quality: 0.85});
+                showGalleryPreview(galleryProcessed.previewURL);
             }
         });
-        inputUpload.addEventListener('change', () => {
-            const file = inputUpload.files?.[0];
+
+        inputUpload.addEventListener('change', async () => {
+            const file = inputUpload.files && inputUpload.files[0];
             fileNameEl.textContent = file ? file.name : 'No file selected';
+            if (file) {
+                galleryProcessed = await blobFromSource(file, {maxDim: 1600, quality: 0.85});
+                showGalleryPreview(galleryProcessed.previewURL);
+            } else {
+                showGalleryPreview(null);
+            }
+        });
+
+        // Intercept Gallery form submit to send processed blob
+        formUpload.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const lang = qs('#lang-upload').value;
+            const file = inputUpload.files && inputUpload.files[0];
+            if (!file) {
+                alert('Please select a file.');
+                return;
+            }
+            if (!galleryProcessed) {
+                galleryProcessed = await blobFromSource(file, {maxDim: 1600, quality: 0.85});
+            }
+            const formData = new FormData();
+            formData.append('lang', lang);
+            formData.append('file', galleryProcessed.blob, file.name.replace(/\.[^.]+$/, '') + '-optimized.jpg');
+            const submitBtn = formUpload.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Uploading...';
+            try {
+                const res = await fetch(formUpload.getAttribute('action') || '/scan', {method: 'POST', body: formData});
+                if (res.redirected) {
+                    window.location.href = res.url;
+                    return;
+                }
+                if (res.ok) {
+                    const data = await res.json().catch(() => ({}));
+                    if (data && data.redirect) {
+                        window.location.href = data.redirect;
+                    } else {
+                        submitBtn.textContent = 'Uploaded! Processing...';
+                    }
+                } else {
+                    throw new Error('Upload failed');
+                }
+            } catch (err) {
+                alert('Upload failed. Please try again or use Camera.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Scan Barcode';
+            }
         });
 
         // --- Camera: capability detection & UX ---
@@ -215,10 +344,8 @@
         const btnRetake = qs('#btnRetake');
         const btnUploadCapture = qs('#btnUploadCapture');
         const video = qs('#video');
-        const canvas = qs('#canvas');
         const previewWrap = qs('#previewWrap');
         const previewImg = qs('#previewImg');
-        const liveWrap = qs('#liveWrap');
         const fallbackNote = qs('#fallbackNote');
 
         let stream = null;
@@ -243,16 +370,15 @@
                 disableLiveCameraUI();
                 return false;
             }
-            // Try requesting minimal camera access to validate capability
             try {
                 const test = await navigator.mediaDevices.getUserMedia({video: true});
                 test.getTracks().forEach(t => t.stop());
                 setLiveState('ready');
                 enableLiveCameraUI();
                 return true;
-            } catch (e) {
+            } catch {
                 setLiveState('unsupported');
-                disableLiveCameraUI(e);
+                disableLiveCameraUI();
                 return false;
             }
         }
@@ -262,12 +388,11 @@
             fallbackNote.classList.add('hidden');
         }
 
-        function disableLiveCameraUI(err) {
+        function disableLiveCameraUI() {
             btnStart.disabled = true;
             btnCapture.disabled = true;
             btnRetake.disabled = true;
             btnUploadCapture.disabled = true;
-            // Emphasize native capture fallback
             fallbackNote.classList.remove('hidden');
         }
 
@@ -284,9 +409,9 @@
                 btnUploadCapture.disabled = true;
                 previewWrap.classList.add('hidden');
                 capturedBlob = null;
-            } catch (e) {
+            } catch {
                 setLiveState('unsupported');
-                disableLiveCameraUI(e);
+                disableLiveCameraUI();
             }
         }
 
@@ -297,36 +422,23 @@
             }
         }
 
-        function downscaleAndCompress(videoEl) {
-            // Create a canvas at a mobile-friendly resolution to reduce payload size
-            const maxDim = 1600; // pixels
-            const vw = videoEl.videoWidth;
-            const vh = videoEl.videoHeight;
-            const scale = Math.min(1, maxDim / Math.max(vw, vh));
-            const cw = Math.max(1, Math.round(vw * scale));
-            const ch = Math.max(1, Math.round(vh * scale));
-            canvas.width = cw;
-            canvas.height = ch;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(videoEl, 0, 0, cw, ch);
-            return new Promise((resolve) => {
-                canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.85);
-            });
+        async function downscaleFromVideo(videoEl) {
+            return blobFromSource(videoEl, {maxDim: 1600, quality: 0.85});
         }
 
         btnStart.addEventListener('click', startLive);
 
         btnCapture.addEventListener('click', async () => {
             if (!video.videoWidth) return;
-            capturedBlob = await downscaleAndCompress(video);
-            // Show preview image
-            previewImg.src = URL.createObjectURL(capturedBlob);
+            const processed = await downscaleFromVideo(video);
+            capturedBlob = processed.blob;
+            // Show preview image (processed, orientation-consistent)
+            previewImg.src = processed.previewURL;
             previewWrap.classList.remove('hidden');
             setLiveState('captured');
             btnRetake.disabled = false;
             btnUploadCapture.disabled = false;
             btnCapture.disabled = true;
-            // Pause stream preview but keep tracks running until upload/retake
             video.pause();
         });
 
@@ -347,28 +459,20 @@
             const formData = new FormData();
             formData.append('lang', lang);
             formData.append('file', capturedBlob, `capture-${Date.now()}.jpg`);
-
-            // Disable UI while uploading
             btnUploadCapture.disabled = true;
             btnUploadCapture.textContent = 'Uploading...';
-
             try {
                 const res = await fetch((document.getElementById('form-upload')?.getAttribute('action')) || '/scan', {
-                    method: 'POST', body: formData
+                    method: 'POST',
+                    body: formData
                 });
-                // If server redirects to a result page, follow it
                 if (res.redirected) {
                     window.location.href = res.url;
                     return;
                 }
                 if (res.ok) {
-                    // Assume JSON with redirect or message
                     const data = await res.json().catch(() => ({}));
-                    if (data?.redirect) {
-                        window.location.href = data.redirect;
-                    } else {
-                        btnUploadCapture.textContent = 'Uploaded! Processing...';
-                    }
+                    if (data?.redirect) window.location.href = data.redirect; else btnUploadCapture.textContent = 'Uploaded! Processing...';
                 } else {
                     throw new Error('Upload failed');
                 }
@@ -390,6 +494,63 @@
         langCameraSel.addEventListener('change', syncLang);
         syncLang();
 
+        // Native capture preview + processed upload
+        const nativeForm = qs('#form-native');
+        const nativeInput = qs('#file-native');
+        const nativePreviewWrap = qs('#nativePreviewWrap');
+        const nativePreview = qs('#nativePreview');
+        let nativeProcessed = null;
+
+        if (nativeInput) {
+            nativeInput.addEventListener('change', async () => {
+                const file = nativeInput.files && nativeInput.files[0];
+                if (!file) {
+                    nativePreviewWrap.classList.add('hidden');
+                    nativeProcessed = null;
+                    return;
+                }
+                nativeProcessed = await blobFromSource(file, {maxDim: 1600, quality: 0.85});
+                nativePreview.src = nativeProcessed.previewURL;
+                nativePreviewWrap.classList.remove('hidden');
+            });
+        }
+
+        nativeForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const lang = langNative.value;
+            const file = nativeInput.files && nativeInput.files[0];
+            if (!file) {
+                alert('Please take a photo.');
+                return;
+            }
+            if (!nativeProcessed) {
+                nativeProcessed = await blobFromSource(file, {maxDim: 1600, quality: 0.85});
+            }
+            const formData = new FormData();
+            formData.append('lang', lang);
+            formData.append('file', nativeProcessed.blob, `capture-${Date.now()}.jpg`);
+            const submitBtn = nativeForm.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Uploading...';
+            try {
+                const res = await fetch(nativeForm.getAttribute('action') || '/scan', {method: 'POST', body: formData});
+                if (res.redirected) {
+                    window.location.href = res.url;
+                    return;
+                }
+                if (res.ok) {
+                    const data = await res.json().catch(() => ({}));
+                    if (data?.redirect) window.location.href = data.redirect; else submitBtn.textContent = 'Uploaded! Processing...';
+                } else {
+                    throw new Error('Upload failed');
+                }
+            } catch (err) {
+                alert('Upload failed. Please try again.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Scan with Native Capture';
+            }
+        });
+
         // Run capability check on first open of Camera tab
         let checked = false;
         tabCamera.addEventListener('click', async () => {
@@ -406,7 +567,9 @@
         }
 
         // Clean up camera on page unload / tab switch
-        window.addEventListener('pagehide', stopLive);
+        window.addEventListener('pagehide', () => {
+            stopLive();
+        });
         tabUpload.addEventListener('click', stopLive);
     </script>
 </main>
