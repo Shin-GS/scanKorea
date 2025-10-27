@@ -11,4 +11,9 @@ public enum SuccessCode implements Code {
     ;
 
     private final HttpStatus httpStatus;
+
+    @Override
+    public boolean isSuccess() {
+        return true;
+    }
 }

@@ -13,4 +13,9 @@ public enum ErrorCode implements Code {
     ;
 
     private final HttpStatus httpStatus;
+
+    @Override
+    public boolean isSuccess() {
+        return false;
+    }
 }

@@ -7,7 +7,9 @@ public interface Code {
 
     String name();
 
-    default int getStatus() {
+    boolean isSuccess();
+
+    default int getHttpStatusCode() {
         return getHttpStatus().value();
     }
 }
