@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{views/layout :: head}">
+    <!--/*@thymesVar id="pageTitle" type="java.lang.String"*/-->
+    <title th:text="${pageTitle} ?: 'ScanKorea'">ScanKorea</title>
+</head>
+<body>
+<main th:fragment="~{views/layout :: content}">
+    <!-- Error container -->
+    <section class="w-full max-w-xl bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 sm:p-8 mx-auto mt-10">
+
+        <!-- Error badge -->
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-semibold bg-red-50 text-red-700 dark:bg-red-900 dark:text-red-200 mb-4">
+            <!-- Simple icon -->
+            <span aria-hidden="true">!</span>
+            <span>Invalid Request</span>
+        </div>
+
+        <!-- Error heading -->
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+            <!-- Primary message (Korean) -->
+            잘못된 요청입니다. 메인 페이지로 이동해주세요
+        </h1>
+
+        <!-- Subtext -->
+        <p class="text-gray-600 dark:text-gray-300 mb-6">
+            If you believe this is a mistake, please try again from the home page.
+        </p>
+
+        <!-- Actions -->
+        <div class="flex flex-col sm:flex-row gap-3">
+            <!-- Go Home button -->
+            <a th:href="@{/}"
+               class="inline-flex justify-center items-center rounded-lg px-5 py-3 font-semibold bg-brand hover:bg-blue-700 text-white transition">
+                Go to Home
+            </a>
+
+            <!-- Optional: Back link (uses browser history) -->
+            <button type="button"
+                    onclick="history.back()"
+                    class="inline-flex justify-center items-center rounded-lg px-5 py-3 font-semibold bg-gray-600 hover:bg-gray-700 text-white transition">
+                Go Back
+            </button>
+        </div>
+
+        <!-- Hint / divider -->
+        <hr class="my-6 border-gray-200 dark:border-slate-700"/>
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+            <!-- Keep this line if you want a support hint; otherwise remove -->
+            Need help? Contact support or try scanning again.
+        </p>
+    </section>
+</main>
+</body>
+</html>
