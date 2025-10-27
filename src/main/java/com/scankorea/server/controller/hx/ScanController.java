@@ -1,4 +1,4 @@
-package com.scankorea.server.controller;
+package com.scankorea.server.controller.hx;
 
 import com.scankorea.server.common.constant.LanguageCode;
 import com.scankorea.server.service.product.BarcodeDecoder;
@@ -22,11 +22,6 @@ import java.util.List;
 public class ScanController {
     private final BarcodeDecoder barcodeDecoder;
     private final ProductService productService;
-
-    @GetMapping({"/", "/scan"})
-    public String scanPage() {
-        return "/views/scan";
-    }
 
     @PostMapping(value = "/scan", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public String scanPhoto(@RequestParam("file") MultipartFile file,
