@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
 @RestControllerAdvice(annotations = org.springframework.web.bind.annotation.RestController.class)
-@org.springframework.core.annotation.Order
+@org.springframework.core.annotation.Order(org.springframework.core.Ordered.HIGHEST_PRECEDENCE)
 @RequiredArgsConstructor
 public class GlobalApiExceptionHandler {
     private final CustomResponseBuilder responseBuilder;
