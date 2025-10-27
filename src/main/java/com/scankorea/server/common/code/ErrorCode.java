@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode implements Code {
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED),
+    ENTITY_NOT_FOUND(HttpStatus.NOT_FOUND),
     ;
 
     private final HttpStatus httpStatus;
