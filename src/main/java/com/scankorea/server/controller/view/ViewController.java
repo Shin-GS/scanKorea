@@ -24,7 +24,7 @@ public class ViewController {
 
     @GetMapping("/scan/{gtin}")
     public String scanResult(@PathVariable(name = "gtin") String gtin,
-                             @RequestParam(name = "lang") LanguageCode lang,
+                             @RequestParam(name = "lang", required = false) LanguageCode lang,
                              Model model) {
         List<ProductViewResponse> products = productService.findSimilarProducts(gtin, lang);
         model.addAttribute("products", products);
@@ -33,7 +33,7 @@ public class ViewController {
 
     @GetMapping("/products/{gtin}")
     public String productDetail(@PathVariable(name = "gtin") String gtin,
-                                @RequestParam(name = "lang") LanguageCode lang,
+                                @RequestParam(name = "lang", required = false) LanguageCode lang,
                                 Model model) {
         ProductViewResponse view = productService.findView(gtin, lang);
         model.addAttribute("product", view);

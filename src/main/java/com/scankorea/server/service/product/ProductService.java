@@ -24,6 +24,8 @@ public class ProductService {
 
     public ProductViewResponse findView(String gtin,
                                         LanguageCode lang) {
+        lang = (lang == null) ? Constant.DEFAULT_LANGUAGE : lang; // todo 수정 필요
+
         ProductEntity product = productRepository.findByGtin(gtin)
                 .orElseThrow(() -> new CustomException(ErrorCode.ENTITY_NOT_FOUND));
         ProductLocaleEntity productLocale = productLocaleRepository.findFirstByProductIdAndLang(product.getId(), lang)

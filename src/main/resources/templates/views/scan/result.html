@@ -9,8 +9,7 @@
     <!-- Toolbar for re-scan -->
     <section class="w-full max-w-5xl flex flex-wrap justify-between items-center gap-4 mb-8 mx-auto">
         <h1 class="text-2xl sm:text-3xl font-bold text-brand dark:text-blue-400">Scan Result</h1>
-
-        <form class="flex flex-wrap items-center gap-2" th:action="@{/templates/views/scan}" method="post"
+        <form class="flex flex-wrap items-center gap-2" th:action="@{/scan}" method="post"
               enctype="multipart/form-data">
             <label for="lang" class="text-sm text-gray-600 dark:text-gray-300">Language</label>
             <select id="lang" name="lang" required
@@ -39,7 +38,6 @@
 
     <!-- Main content area -->
     <section class="w-full max-w-5xl mx-auto">
-
         <!-- Empty result message -->
         <div th:if="${#lists.isEmpty(products)}"
              class="border-2 border-dashed border-gray-300 dark:border-slate-600 bg-white/70 dark:bg-slate-800 text-gray-600 dark:text-gray-300 text-center rounded-xl py-10 px-6 mt-8">
@@ -52,32 +50,32 @@
              th:if="${!#lists.isEmpty(products)}">
             <article
                     class="bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 flex flex-col gap-3 transition hover:shadow-lg"
-                    th:each="p : ${products}">
+                    th:each="product : ${products}">
 
-                <img th:if="${p.imageUrl}" th:src="${p.imageUrl}" alt="Product image"
+                <img th:if="${product.imageUrl}" th:src="${product.imageUrl}" alt="Product image"
                      class="w-full h-44 object-cover rounded-lg bg-gray-100 dark:bg-slate-700"/>
 
                 <div>
-                    <div class="text-sm text-gray-500 dark:text-gray-400" th:text="${p.brandName}">Brand</div>
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100" th:text="${p.displayName}">
+                    <div class="text-sm text-gray-500 dark:text-gray-400" th:text="${product.brandName}">Brand</div>
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100" th:text="${product.displayName}">
                         Product Name
                     </h3>
                     <div class="text-sm text-gray-500 dark:text-gray-400">
                         <span>GTIN:</span>
-                        <span th:text="${p.gtin}" class="ml-1">0000000000000</span>
-                        <span th:if="${p.verified}" class="ml-2 text-blue-600 dark:text-blue-400 font-medium">
-              · Verified
-            </span>
+                        <span th:text="${product.gtin}" class="ml-1">0000000000000</span>
+                        <span th:if="${product.verified}" class="ml-2 text-blue-600 dark:text-blue-400 font-medium">
+                          · Verified
+                        </span>
                     </div>
                 </div>
 
-                <p th:text="${p.description}"
+                <p th:text="${product.description}"
                    class="text-gray-700 dark:text-gray-300 text-sm leading-snug">
                     Description...
                 </p>
 
                 <div class="mt-auto pt-2">
-                    <a th:href="@{/product/{gtin}(gtin=${p.gtin}, lang=${param.lang})}"
+                    <a th:href="@{/products/{gtin}(gtin=${product.gtin}, lang=${param.lang})}"
                        class="block w-full text-center bg-brand hover:bg-blue-700 text-white font-semibold rounded-lg py-2 transition">
                         View details
                     </a>
@@ -85,7 +83,6 @@
             </article>
         </div>
     </section>
-
 </main>
 </body>
 </html>

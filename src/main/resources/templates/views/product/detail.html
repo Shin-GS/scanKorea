@@ -9,7 +9,6 @@
     <!-- Product detail content -->
     <section
             class="w-full max-w-4xl bg-white dark:bg-slate-800 rounded-xl shadow-md grid grid-cols-1 sm:grid-cols-[300px,1fr] gap-6 sm:gap-8 p-6 sm:p-8 mx-auto">
-
         <!-- Product image -->
         <img th:if="${product.imageUrl}" th:src="${product.imageUrl}" alt="Product image"
              class="w-full h-64 object-cover rounded-xl bg-gray-100 dark:bg-slate-700"/>
@@ -18,14 +17,13 @@
         <section>
             <p class="text-gray-500 dark:text-gray-400 text-sm mb-1" th:text="${product.brandName}">Brand</p>
             <h2 class="text-xl font-semibold mb-3" th:text="${product.displayName}">Display Name</h2>
-
             <p class="text-gray-700 dark:text-gray-200 mb-2">
                 <span class="text-gray-500 dark:text-gray-400">GTIN:</span>
                 <strong th:text="${product.gtin}" class="ml-1">0000000000000</strong>
                 <span th:if="${product.verified}"
                       class="ml-2 inline-block bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-200 text-xs font-semibold px-2 py-0.5 rounded-full">
-          Verified
-        </span>
+                  Verified
+                </span>
             </p>
 
             <p class="text-gray-700 dark:text-gray-200 mb-4">
@@ -41,7 +39,7 @@
             </article>
 
             <!-- Language form and back button -->
-            <form class="flex flex-wrap items-center gap-2 mt-6" th:action="@{|/product/${product.gtin}|}" method="get">
+            <form class="flex flex-wrap items-center gap-2 mt-6" th:action="@{|/products/${product.gtin}|}" method="get">
                 <label for="lang" class="text-sm text-gray-600 dark:text-gray-300">Language</label>
                 <select id="lang" name="lang"
                         class="px-3 py-2 border border-gray-300 rounded-lg text-gray-800 bg-white dark:bg-slate-700 dark:text-gray-100 dark:border-slate-600">
@@ -55,7 +53,7 @@
                         class="bg-brand hover:bg-blue-700 text-white font-semibold rounded-lg px-4 py-2 transition">
                     Apply
                 </button>
-                <a th:href="@{/templates/views/scan}"
+                <a th:href="@{/scan}"
                    class="bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg px-4 py-2 transition">
                     Back
                 </a>

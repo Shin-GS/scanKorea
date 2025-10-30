@@ -2,7 +2,7 @@ package com.scankorea.server.controller.hx;
 
 import com.scankorea.server.common.util.GtinUtils;
 import com.scankorea.server.service.product.BarcodeDecoder;
-import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -11,22 +11,19 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.util.UriUtils;
 
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 @Slf4j
 @Controller
 @RequiredArgsConstructor
 public class ScanHxController {
-
     private final BarcodeDecoder barcodeDecoder;
 
-    @HxRequest
-    @PostMapping(value = "/scan", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/hx/scan", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public String scanPhoto(@RequestParam("file") MultipartFile file,
+                            HttpServletResponse response,
                             Model model) {
         if (file == null || file.isEmpty()) {
             model.addAttribute("error", "이미지를 선택해 주세요.");
@@ -53,7 +50,8 @@ public class ScanHxController {
                 return "/views/scan/scan";
             }
 
-            return "redirect:htmx:/scan/" + gtin;
+            response.setHeader("HX-REDIRECT", "/scan/" + gtin);
+            return null;
 
         } catch (Exception e) {
             log.warn("Scan processing failed", e);

@@ -18,7 +18,7 @@ public class ProductApi {
 
     @GetMapping("/products/{gtin}")
     public Response<ProductViewResponse> productDetail(@PathVariable(name = "gtin") String gtin,
-                                                       @RequestParam(name = "lang") LanguageCode lang) {
+                                                       @RequestParam(name = "lang", required = false) LanguageCode lang) {
         ProductViewResponse productView = productService.findView(gtin, lang);
         return responseBuilder.of(SuccessCode.SUC, productView);
     }
