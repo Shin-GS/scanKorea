@@ -7,6 +7,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class ViewController {
     @GetMapping({"/", "/scan"})
     public String scanPage() {
-        return "/views/scan";
+        return "/views/scan/scan";
     }
 }

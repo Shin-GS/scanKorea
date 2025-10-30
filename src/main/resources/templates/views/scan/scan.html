@@ -32,7 +32,7 @@
         </div>
 
         <!-- Upload: Gallery file input (universal) -->
-        <form id="form-upload" th:action="@{/scan}" method="post" enctype="multipart/form-data" class="space-y-4"
+        <form id="form-upload" th:action="@{/templates/views/scan}" method="post" enctype="multipart/form-data" class="space-y-4"
               role="tabpanel" aria-labelledby="tab-upload">
             <!-- Language selection -->
             <div>
@@ -133,7 +133,7 @@
             <!-- B. Native capture fallback (robust on iOS/Android) -->
             <div class="pt-3 border-t border-dashed border-gray-300 dark:border-slate-700">
                 <p class="text-xs text-gray-500 mb-2">If live camera isn’t supported, use native capture:</p>
-                <form id="form-native" th:action="@{/scan}" method="post" enctype="multipart/form-data"
+                <form id="form-native" th:action="@{/templates/views/scan}" method="post" enctype="multipart/form-data"
                       class="space-y-2">
                     <input type="hidden" name="lang" id="lang-native"/>
                     <label for="file-native" class="block font-medium text-gray-700 dark:text-gray-200">Native

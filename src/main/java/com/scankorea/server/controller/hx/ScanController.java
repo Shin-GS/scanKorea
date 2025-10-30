@@ -29,7 +29,7 @@ public class ScanController {
                             Model model) {
         if (file.isEmpty()) {
             model.addAttribute("error", "이미지를 업로드해 주세요.");
-            return "/views/scan";
+            return "/views/scan/scan";
         }
 
         try (InputStream in = file.getInputStream()) {
@@ -37,11 +37,11 @@ public class ScanController {
                     .map(gtin -> productService.findView(gtin, lang))
                     .toList();
             model.addAttribute("products", products);
-            return "/views/scan_result";
+            return "/views/scan/result";
 
         } catch (Exception e) {
             model.addAttribute("error", "이미지를 처리할 수 없어요.");
-            return "/views/scan";
+            return "/views/scan/scan";
         }
     }
 
@@ -51,6 +51,6 @@ public class ScanController {
                                 Model model) {
         ProductViewResponse view = productService.findView(gtin, lang);
         model.addAttribute("product", view);
-        return "/views/product_detail";
+        return "/views/product/detail";
     }
 }

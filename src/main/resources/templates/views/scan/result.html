@@ -10,7 +10,7 @@
     <section class="w-full max-w-5xl flex flex-wrap justify-between items-center gap-4 mb-8 mx-auto">
         <h1 class="text-2xl sm:text-3xl font-bold text-brand dark:text-blue-400">Scan Result</h1>
 
-        <form class="flex flex-wrap items-center gap-2" th:action="@{/scan}" method="post"
+        <form class="flex flex-wrap items-center gap-2" th:action="@{/templates/views/scan}" method="post"
               enctype="multipart/form-data">
             <label for="lang" class="text-sm text-gray-600 dark:text-gray-300">Language</label>
             <select id="lang" name="lang" required
