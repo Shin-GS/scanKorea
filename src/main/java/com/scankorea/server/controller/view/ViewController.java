@@ -20,7 +20,7 @@ public class ViewController {
         return "/views/scan/scan";
     }
 
-    @GetMapping("/p/{gtin}")
+    @GetMapping("/product/{gtin}")
     public String productDetail(@PathVariable(name = "gtin") String gtin,
                                 @RequestParam(name = "lang") LanguageCode lang,
                                 Model model) {

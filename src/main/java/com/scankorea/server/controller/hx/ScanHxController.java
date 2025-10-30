@@ -17,7 +17,7 @@ import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
-public class ScanController {
+public class ScanHxController {
     private final BarcodeDecoder barcodeDecoder;
     private final ProductService productService;
 
