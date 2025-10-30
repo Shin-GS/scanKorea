@@ -53,8 +53,7 @@ public class ScanHxController {
                 return "/views/scan/scan";
             }
 
-            String encoded = UriUtils.encodePathSegment(gtin, StandardCharsets.UTF_8);
-            return "redirect:htmx:/scan/result/" + encoded;
+            return "redirect:htmx:/scan/" + gtin;
 
         } catch (Exception e) {
             log.warn("Scan processing failed", e);
