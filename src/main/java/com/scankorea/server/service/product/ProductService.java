@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -28,5 +30,11 @@ public class ProductService {
                 .orElse(productLocaleRepository.findFirstByProductIdAndLang(product.getId(), Constant.DEFAULT_LANGUAGE)
                         .orElseThrow(() -> new CustomException(ErrorCode.ENTITY_NOT_FOUND)));
         return ProductViewResponse.of(product, productLocale);
+    }
+
+    public List<ProductViewResponse> findSimilarProducts(String gtin,
+                                                         LanguageCode lang) {
+        // todo 유사한 제품 정책 정해야함
+        return List.of(findView(gtin, lang));
     }
 }

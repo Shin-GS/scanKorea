@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
+
 @Controller
 @RequiredArgsConstructor
 public class ViewController {
@@ -20,7 +22,16 @@ public class ViewController {
         return "/views/scan/scan";
     }
 
-    @GetMapping("/product/{gtin}")
+    @GetMapping("/scan/{gtin}")
+    public String scanResult(@PathVariable(name = "gtin") String gtin,
+                             @RequestParam(name = "lang") LanguageCode lang,
+                             Model model) {
+        List<ProductViewResponse> products = productService.findSimilarProducts(gtin, lang);
+        model.addAttribute("products", products);
+        return "/views/scan/result";
+    }
+
+    @GetMapping("/products/{gtin}")
     public String productDetail(@PathVariable(name = "gtin") String gtin,
                                 @RequestParam(name = "lang") LanguageCode lang,
                                 Model model) {
