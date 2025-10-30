@@ -8,8 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,14 +41,5 @@ public class ScanController {
             model.addAttribute("error", "이미지를 처리할 수 없어요.");
             return "/views/scan/scan";
         }
-    }
-
-    @GetMapping("/p/{gtin}")
-    public String productDetail(@PathVariable(name = "gtin") String gtin,
-                                @RequestParam(name = "lang") LanguageCode lang,
-                                Model model) {
-        ProductViewResponse view = productService.findView(gtin, lang);
-        model.addAttribute("product", view);
-        return "/views/product/detail";
     }
 }
