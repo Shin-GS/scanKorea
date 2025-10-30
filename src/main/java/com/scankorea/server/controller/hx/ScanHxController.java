@@ -1,5 +1,6 @@
 package com.scankorea.server.controller.hx;
 
+import com.scankorea.server.common.util.GtinUtils;
 import com.scankorea.server.service.product.BarcodeDecoder;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxRequest;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +47,7 @@ public class ScanHxController {
             }
 
             String gtin = optionalGtin.get();
-            if (!gtin.matches("^[0-9]{8,14}$")) {
+            if (!GtinUtils.isValidGtin(gtin)) {
                 log.warn("Unsupported GTIN pattern detected: {}", gtin);
                 model.addAttribute("error", "지원하지 않는 바코드 형식입니다.");
                 return "/views/scan/scan";
