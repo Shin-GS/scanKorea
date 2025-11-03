@@ -25,14 +25,14 @@ public class ScanHxController {
                             HttpServletResponse response) {
         if (file == null || file.isEmpty()) {
             response.setHeader("HX-Client-Redirect", "/scan");
-            response.setHeader("HX-Alert", "please select image file");
+            response.setHeader("HX-Alert", "Please select an image to upload.");
             return null;
         }
 
         String contentType = file.getContentType();
         if (contentType == null || !contentType.startsWith("image/")) {
             response.setHeader("HX-Client-Redirect", "/scan");
-            response.setHeader("HX-Alert", "you can upload image file");
+            response.setHeader("HX-Alert", "Only image files are supported. Please upload a valid photo.");
             return null;
         }
 
@@ -40,23 +40,24 @@ public class ScanHxController {
             Optional<String> optionalGtin = barcodeDecoder.decodeGtins(in).stream().findFirst();
             if (optionalGtin.isEmpty()) {
                 response.setHeader("HX-Client-Redirect", "/scan");
-                response.setHeader("HX-Alert", "Can not found Barcode from Image");
+                response.setHeader("HX-Alert", "No barcode detected. Please try again with a clearer photo.");
                 return null;
             }
 
             String gtin = optionalGtin.get();
             if (!GtinUtils.isValidGtin(gtin)) {
                 response.setHeader("HX-Client-Redirect", "/scan");
-                response.setHeader("HX-Alert", "Unsupported GTIN pattern");
+                response.setHeader("HX-Alert", "The scanned code format is not supported.");
                 return null;
             }
 
             response.setHeader("HX-Client-Redirect", "/scan/" + gtin);
+            response.setHeader("HX-Alert", "Barcode recognized successfully!");
             return null;
 
         } catch (Exception e) {
             response.setHeader("HX-Client-Redirect", "/scan");
-            response.setHeader("HX-Alert", "Internal Server Error");
+            response.setHeader("HX-Alert", "An unexpected error occurred. Please try again later.");
             return null;
         }
     }
