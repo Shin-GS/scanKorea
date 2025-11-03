@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,40 +22,42 @@ public class ScanHxController {
 
     @PostMapping(value = "/hx/scan", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public String scanPhoto(@RequestParam("file") MultipartFile file,
-                            HttpServletResponse response,
-                            Model model) {
+                            HttpServletResponse response) {
         if (file == null || file.isEmpty()) {
-            model.addAttribute("error", "이미지를 선택해 주세요.");
-            return "/views/scan/scan";
+            response.setHeader("HX-Client-Redirect", "/scan");
+            response.setHeader("HX-Alert", "please select image file");
+            return null;
         }
 
         String contentType = file.getContentType();
         if (contentType == null || !contentType.startsWith("image/")) {
-            model.addAttribute("error", "이미지 파일만 업로드할 수 있어요.");
-            return "/views/scan/scan";
+            response.setHeader("HX-Client-Redirect", "/scan");
+            response.setHeader("HX-Alert", "you can upload image file");
+            return null;
         }
 
         try (InputStream in = file.getInputStream()) {
             Optional<String> optionalGtin = barcodeDecoder.decodeGtins(in).stream().findFirst();
             if (optionalGtin.isEmpty()) {
-                model.addAttribute("error", "이미지에서 바코드를 찾지 못했어요.");
-                return "/views/scan/scan";
+                response.setHeader("HX-Client-Redirect", "/scan");
+                response.setHeader("HX-Alert", "Can not found Barcode from Image");
+                return null;
             }
 
             String gtin = optionalGtin.get();
             if (!GtinUtils.isValidGtin(gtin)) {
-                log.warn("Unsupported GTIN pattern detected: {}", gtin);
-                model.addAttribute("error", "지원하지 않는 바코드 형식입니다.");
-                return "/views/scan/scan";
+                response.setHeader("HX-Client-Redirect", "/scan");
+                response.setHeader("HX-Alert", "Unsupported GTIN pattern");
+                return null;
             }
 
-            response.setHeader("HX-REDIRECT", "/scan/" + gtin);
+            response.setHeader("HX-Client-Redirect", "/scan/" + gtin);
             return null;
 
         } catch (Exception e) {
-            log.warn("Scan processing failed", e);
-            model.addAttribute("error", "이미지를 처리하는 중 문제가 발생했어요. 잠시 후 다시 시도해 주세요.");
-            return "/views/scan/scan";
+            response.setHeader("HX-Client-Redirect", "/scan");
+            response.setHeader("HX-Alert", "Internal Server Error");
+            return null;
         }
     }
 }
