@@ -56,6 +56,8 @@ public class ScanHxController {
             return null;
 
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
+
             response.setHeader("HX-Client-Redirect", "/scan");
             response.setHeader("HX-Alert", "An unexpected error occurred. Please try again later.");
             return null;
