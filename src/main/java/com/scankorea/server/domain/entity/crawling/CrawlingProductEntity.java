@@ -16,7 +16,6 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class CrawlingProductEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,4 +51,22 @@ public class CrawlingProductEntity {
     @Lob
     @Column(name = "RAW_JSON", nullable = false, columnDefinition = "TEXT")
     private String rawJson; // 전체 JSON 데이터 (수집 원문)
+
+    public static CrawlingProductEntity of(String gtin,
+                                           String productName,
+                                           String targetCategory,
+                                           String productClass,
+                                           String companyName,
+                                           String brandName,
+                                           String rawJson) {
+        CrawlingProductEntity product = new CrawlingProductEntity();
+        product.gtin = gtin;
+        product.productName = productName;
+        product.targetCategory = targetCategory;
+        product.productClass = productClass;
+        product.companyName = companyName;
+        product.brandName = brandName;
+        product.rawJson = rawJson;
+        return product;
+    }
 }

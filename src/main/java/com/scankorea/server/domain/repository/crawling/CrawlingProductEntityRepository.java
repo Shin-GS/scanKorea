@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface CrawlingProductEntityRepository extends JpaRepository<CrawlingProductEntity, Long> {
     Optional<CrawlingProductEntity> findByGtinAndProductName(String gtin, String productName);
+
+    boolean existsByGtinAndProductName(String gtin, String productName);
 }
