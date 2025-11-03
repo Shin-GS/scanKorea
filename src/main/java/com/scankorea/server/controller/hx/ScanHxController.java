@@ -52,7 +52,6 @@ public class ScanHxController {
             }
 
             response.setHeader("HX-Client-Redirect", "/scan/" + gtin);
-            response.setHeader("HX-Alert", "Barcode recognized successfully!");
             return null;
 
         } catch (Exception e) {
